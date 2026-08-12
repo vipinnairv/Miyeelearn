@@ -80,8 +80,10 @@ document.getElementById('login-form').addEventListener('submit', async (e)=>{
     .single();
 
   if(perr || !profile){
+    console.error('Profile fetch failed. Auth user id:', data.user.id, 'Error:', perr);
     btn.disabled = false; btn.textContent = 'Sign In \u2192';
-    msg.innerHTML = `<div class="err">Signed in, but no profile is set up for this account yet. Contact your administrator.</div>`;
+    const detail = perr ? `${esc(perr.message)} (code: ${esc(perr.code||'unknown')})` : 'No matching profile row.';
+    msg.innerHTML = `<div class="err">Signed in, but could not load your profile.<br><span style="font-size:11px;opacity:.8">Debug: ${detail}<br>Auth user id: ${esc(data.user.id)}</span></div>`;
     await sb.auth.signOut();
     return;
   }
