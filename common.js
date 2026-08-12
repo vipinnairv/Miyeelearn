@@ -66,3 +66,31 @@ function topbarHTML(profile, activeLink){
 function devCreditHTML(){
   return `<div class="dev-credit">Developed by Vipin Nair</div>`;
 }
+
+// Fetches a course's full semester -> module -> lesson tree in one nested query, sorted by order_index.
+async function fetchCourseTree(courseId){
+  const { data, error } = await sb.from('semesters')
+    .select('id,course_id,name,order_index,pass_mark,duration_mins,modules(id,semester_id,name,order_index,lessons(id,module_id,title,ltype,mins,video_url,body,fields,order_index))')
+    .eq('course_id', courseId);
+  if(error) throw error;
+  const semesters = (data||[]).slice().sort((a,b)=>a.order_index-b.order_index);
+  semesters.forEach(s=>{
+    s.modules = (s.modules||[]).slice().sort((a,b)=>a.order_index-b.order_index);
+    s.modules.forEach(m=>{ m.lessons = (m.lessons||[]).slice().sort((a,b)=>a.order_index-b.order_index); });
+  });
+  return semesters;
+}
+
+function openModal(innerHtml, opts){
+  closeModal();
+  const ov = document.createElement('div');
+  ov.id = 'modal-overlay';
+  ov.className = 'modal-overlay';
+  ov.innerHTML = '<div class="modal-box'+(opts&&opts.wide?' wide':'')+'">'+innerHtml+'</div>';
+  ov.addEventListener('click', (e)=>{ if(e.target===ov) closeModal(); });
+  document.body.appendChild(ov);
+}
+function closeModal(){
+  const ov = document.getElementById('modal-overlay');
+  if(ov) ov.remove();
+}

@@ -132,3 +132,56 @@ a{color:var(--blue);cursor:pointer;text-decoration:none}
 .wf-actions{display:flex;justify-content:flex-end;align-items:center;gap:14px;margin-top:6px}
 .wf-save-status{font-size:12px;color:var(--ok)}
 .mentor-feedback{background:var(--light);border-radius:8px;padding:12px 14px;font-size:13.5px;margin:10px 0 16px;line-height:1.6}
+
+/* Admin tab bar */
+.admin-tabs{background:#fff;border-bottom:1px solid var(--border)}
+.admin-tabs-inner{max-width:1240px;margin:0 auto;display:flex;gap:4px;padding:0 20px;overflow-x:auto}
+.admin-tab{padding:14px 16px;font-weight:600;font-size:13.5px;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+.admin-tab:hover{color:var(--navy)}
+.admin-tab.active{color:var(--navy);border-bottom-color:var(--accent)}
+
+.page-head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}
+.page-head-actions{display:flex;gap:8px;flex-shrink:0}
+
+/* Tree / accordion for Course Designer */
+.tree-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+.tree-sub{background:var(--light);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin:12px 0}
+.tree-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.tree-order{display:inline-block;background:var(--navy);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:5px;margin-right:8px}
+.tree-meta{font-size:12px;color:var(--muted);margin-left:10px}
+.tree-actions{display:flex;gap:6px}
+.tree-body{margin-top:10px}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(11,42,91,.45);display:flex;align-items:center;justify-content:center;z-index:300;padding:20px}
+.modal-box{background:#fff;border-radius:14px;padding:26px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-box.wide{max-width:680px}
+.modal-box h3{color:var(--navy);margin-bottom:16px;font-size:18px}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+
+/* Admin tables */
+.admin-table{width:100%;border-collapse:collapse}
+.admin-table th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);padding:12px 16px;border-bottom:2px solid var(--border);white-space:nowrap}
+.admin-table td{padding:12px 16px;font-size:13.5px;border-bottom:1px solid var(--border);white-space:nowrap}
+.admin-table tr:last-child td{border-bottom:none}
+
+.ws-filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.ws-filter-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+.review-answers{max-height:320px;overflow-y:auto;margin-bottom:16px;border:1px solid var(--border);border-radius:8px}
+.review-answer{padding:10px 14px;border-bottom:1px solid var(--border)}
+.review-answer:last-child{border-bottom:none}
+.ra-label{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.ra-value{font-size:13.5px;white-space:pre-wrap}
+.rv-reviewed-check{display:flex;align-items:center;gap:8px;font-size:13.5px;margin-top:10px}
+
+.enrol-list{max-height:320px;overflow-y:auto;margin-bottom:6px}
+.enrol-row{display:flex;align-items:center;gap:10px;padding:8px 4px;font-size:14px;border-bottom:1px solid var(--border)}
+.enrol-row:last-child{border-bottom:none}
+
+/* Field builder */
+.fb-row{border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--light)}
+.fb-row-top{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.fb-row-top .fb-label{flex:1;padding:9px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:13.5px}
+.fb-row-top .fb-ftype{padding:9px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:13px}
+.fb-row-actions{display:flex;gap:4px}

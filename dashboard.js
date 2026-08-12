@@ -64,19 +64,7 @@ async function route(){
 }
 
 // ---------- data helpers ----------
-
-async function fetchCourseTree(courseId){
-  const { data, error } = await sb.from('semesters')
-    .select('id,name,order_index,pass_mark,duration_mins,modules(id,name,order_index,lessons(id,title,ltype,mins,video_url,body,fields,order_index))')
-    .eq('course_id', courseId);
-  if(error) throw error;
-  const semesters = (data||[]).slice().sort((a,b)=>a.order_index-b.order_index);
-  semesters.forEach(s=>{
-    s.modules = (s.modules||[]).slice().sort((a,b)=>a.order_index-b.order_index);
-    s.modules.forEach(m=>{ m.lessons = (m.lessons||[]).slice().sort((a,b)=>a.order_index-b.order_index); });
-  });
-  return semesters;
-}
+// fetchCourseTree() lives in common.js (shared with admin.js).
 
 function courseStats(semesters, submittedKeySet, viewedIdSet){
   let total=0, done=0;
