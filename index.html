@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MiyeeUpskill — Learn, Assess, Certify</title>
+<title>MiyeeUpskill - Learn, Assess, Certify</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%230b2a5b%22/%3E%0A%3Crect%20x%3D%2214%22%20y%3D%2238%22%20width%3D%228%22%20height%3D%2214%22%20rx%3D%222%22%20fill%3D%22%23c8a24a%22/%3E%0A%3Crect%20x%3D%2228%22%20y%3D%2230%22%20width%3D%228%22%20height%3D%2222%22%20rx%3D%222%22%20fill%3D%22%23e0c070%22/%3E%0A%3Crect%20x%3D%2242%22%20y%3D%2220%22%20width%3D%228%22%20height%3D%2232%22%20rx%3D%222%22%20fill%3D%22%23c8a24a%22/%3E%0A%3Cpath%20d%3D%22M38%2020%20l8%20-10%20l8%2010%20z%22%20fill%3D%22%23e0c070%22/%3E%0A%3C/svg%3E">
 <style>
 :root{
@@ -38,7 +38,7 @@ a{color:var(--jgu-blue);cursor:pointer}
 .btn-sm{padding:6px 12px;font-size:13px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--jgu-navy),var(--jgu-blue) 60%,#1a4a94);padding:20px}
+.login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--jgu-navy),var(--jgu-blue) 60%,#1a4a94);padding:20px}
 .login-card{background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.3);width:100%;max-width:940px;display:flex;overflow:hidden;min-height:540px}
 .login-left{flex:1.1;background:linear-gradient(160deg,var(--jgu-navy),#1a4a94);color:#fff;padding:44px 40px;display:flex;flex-direction:column;justify-content:center}
 .login-left .lg-logo{background:#fff;padding:14px 16px;border-radius:10px;display:inline-block;margin-bottom:26px;align-self:flex-start}
@@ -232,6 +232,7 @@ table.data tr:hover td{background:#fafbfd}
 .les-row .li b{font-size:13.5px}.les-row .li span{font-size:12px;color:var(--muted)}
 
 .toast{position:fixed;bottom:24px;right:24px;background:var(--jgu-navy);color:#fff;padding:14px 22px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.25);z-index:200;font-size:14px;opacity:0;transform:translateY(20px);transition:.3s}
+.dev-credit{text-align:center;padding:20px 0 8px;font-size:11px;color:var(--muted)}
 .toast.show{opacity:1;transform:translateY(0)}
 .toast.err{background:var(--warn)}
 
@@ -264,7 +265,7 @@ const CERT_LOGO="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org
 </script>
 <script>
 /* ============================================================
-   STORAGE ENGINE — persists to localStorage (survives reload)
+   STORAGE ENGINE, persists to localStorage (survives reload)
    ============================================================ */
 const SK = "miyeeupskill_lms_v1";
 const SCHEMA_VERSION = 3;
@@ -274,7 +275,7 @@ function loadDB(){
   return null;
 }
 
-/* Schema migration — keeps old saved data working when new fields are added */
+/* Schema migration, keeps old saved data working when new fields are added */
 function migrateDB(db){
   if(!db || typeof db!=='object') return null;
   db._v = db._v || 1;
@@ -285,6 +286,7 @@ function migrateDB(db){
   db.courses = Array.isArray(db.courses)?db.courses:[];
   db.progress = db.progress || {};
   db.attempts = db.attempts || {};
+  db.worksheets = db.worksheets || {};
   // v1 -> v2: add grading scale, cert toggles, defaults, audit log
   const S0 = db.settings;
   if(S0.gradeScale===undefined) S0.gradeScale = { A:80, B:70, C:60, D:50 };
@@ -340,7 +342,7 @@ function saveDB(silent){
     return true;
   }catch(e){
     const quota = e && (e.name==='QuotaExceededError' || e.code===22 || e.code===1014 || /quota/i.test(e.message||''));
-    if(!silent) toast(quota?'⚠ Storage is full — export a backup, then remove large photos/videos':'Storage blocked (try a normal browser window)','err');
+    if(!silent) toast(quota?'⚠ Storage is full, export a backup then remove large photos/videos':'Storage blocked (try a normal browser window)','err');
     return false;
   }
 }
@@ -366,139 +368,129 @@ function seedDB(){
       defaultPassMark:50, defaultNeg:0, certPrefix:"MU",
       signCount:3, sigImg1:"", sigImg2:"", sigImg3:"", allowSignup:true
     },
-    admins:[ {email:"admin@miyeeupskill.com", pass:"Miyee@2025", name:"MiyeeUpskill Admin"} ],
+    admins:[ {email:"admin@miyeeupskill.com", pass:"admin123", name:"MiyeeUpskill Admin"} ],
     students:[
-      {id:"MU-25-1001", name:"Rahul Nair", email:"rahul@student.miyee.com", pass:"demo1234", phone:"9876500001", govId:"ABCDE1234F", photo:"", admitDate:"01 April 2025", enrolled:["gst","itr"]},
-      {id:"MU-25-1002", name:"Sneha Patel", email:"sneha@student.miyee.com", pass:"demo1234", phone:"9876500002", govId:"BXYZP5678K", photo:"", admitDate:"01 April 2025", enrolled:["fpa1"]}
+      {id:"MU-25-1001", name:"Rahul Nair", email:"rahul@student.miyee.com", pass:"MU_Fdr_3081", phone:"9876500001", govId:"ABCDE1234F", photo:"", admitDate:"01 April 2025", enrolled:["startup"]},
+      {id:"MU-25-1002", name:"Sneha Patel", email:"sneha@student.miyee.com", pass:"MU_Fdr_5714", phone:"9876500002", govId:"BXYZP5678K", photo:"", admitDate:"01 April 2025", enrolled:["startup"]}
     ],
     courses:[
       {
-        id:"gst", title:"GST Filing Course", tag:"Certificate Program",
-        school:"MiyeeUpskill School of Taxation",
-        duration:"6 Weeks", credits:6, level:"Professional",
-        desc:"A practical, hands-on course on Goods and Services Tax (GST) return filing in India — covering registration, invoicing, GSTR-1, GSTR-3B, GSTR-9, input tax credit, e-way bills and reconciliation, with real filing workflows.",
-        semesters:[{ id:"gst_s1", name:"Module 1 — GST Fundamentals & Filing", modules:[
-          {id:"gst_m1", name:"Foundations of GST", lessons:[
-            {id:"gst_l1", title:"Introduction to GST & Structure (CGST/SGST/IGST)", type:"video", mins:22, video:"", body:"Understand the GST framework in India, the dual structure of CGST, SGST and IGST, and how tax flows across the supply chain."},
-            {id:"gst_l2", title:"GST Registration & GSTIN", type:"video", mins:20, video:"", body:"Who must register, threshold limits, the registration process on the GST portal, and understanding the 15-digit GSTIN."},
-            {id:"gst_l3", title:"Tax Invoices, HSN/SAC & E-Way Bills", type:"video", mins:24, video:"", body:"Preparing compliant tax invoices, HSN/SAC codes, and generating e-way bills for movement of goods."}
+        id:"startup", title:"Startup Mentorship Programme", tag:"Founder Track",
+        school:"MiyeeUpskill Startup Studio",
+        duration:"12 Weeks", credits:10, level:"Founder / Early-Stage",
+        desc:"A hands-on, mentor-guided programme for early-stage founders covering idea validation, customer discovery, MVP building, core startup skills, and pitching, modelled on the worksheets and frameworks used by leading startup accelerators. Founders complete structured worksheets that mentors review and give feedback on throughout the journey.",
+        semesters:[{ id:"su_s1", name:"Semester 1: Idea Validation & Customer Discovery", modules:[
+          {id:"su_m1", name:"Finding a Real Problem", lessons:[
+            {id:"su_l1", title:"Why Most Startups Fail: The Validation Problem", type:"video", mins:20, video:"", body:"Explore common startup failure patterns and why building without validation is the single biggest cause of failure. Learn the build-measure-learn mindset used by top accelerators."},
+            {id:"su_l2", title:"Identifying Problem-Worthy Ideas", type:"video", mins:22, video:"", body:"Frameworks for spotting problems worth solving: personal pain points, market pull, and the difference between a vitamin and a painkiller."},
+            {id:"su_w1", title:"Worksheet: Problem Statement Canvas", type:"worksheet", mins:30, video:"", body:"Define the core problem your startup addresses. Be specific and avoid describing your solution here, focus only on the problem.", fields:[
+        {label:"Who experiences this problem? (target customer)", hint:"Be specific: role, context, demographics", rows:2},
+        {label:"What is the problem, in the customer's own words?", hint:"Describe the pain, not your solution", rows:3},
+        {label:"How do they currently solve or work around this problem?", hint:"Existing alternatives, including doing nothing", rows:3},
+        {label:"How often does this problem occur, and how painful is it (1-10)?", hint:"Frequency and intensity", rows:2},
+        {label:"What evidence do you have that this problem is real?", hint:"Conversations, data, personal experience", rows:3}
+      ]}
           ]},
-          {id:"gst_m2", name:"Returns & Input Tax Credit", lessons:[
-            {id:"gst_l4", title:"Filing GSTR-1 (Outward Supplies)", type:"video", mins:26, video:"", body:"Step-by-step filing of GSTR-1, reporting B2B and B2C sales, amendments, and JSON upload."},
-            {id:"gst_l5", title:"Filing GSTR-3B (Summary Return)", type:"video", mins:24, video:"", body:"Preparing and filing the monthly GSTR-3B summary, tax payment, and offsetting liability with ITC."},
-            {id:"gst_l6", title:"Input Tax Credit & Reconciliation (GSTR-2B)", type:"video", mins:22, video:"", body:"Claiming ITC correctly, matching with GSTR-2B, blocked credits, and reconciliation best practices."},
-            {id:"gst_l7", title:"Annual Return GSTR-9 & Common Errors", type:"reading", mins:20, video:"", body:"Overview of the annual return, reconciliation statement, and the most common filing mistakes to avoid."}
-          ]}
-        ], assessment:{ title:"GST Filing Assessment", passMark:50, durationMins:15, questions:[
-            {q:"GST in India is a tax on:", opts:["Income","Supply of goods and services","Property only","Salary"], correct:1, marks:1, neg:0},
-            {q:"The full form of GST is:", opts:["General Sales Tax","Goods and Services Tax","Gross Service Tax","Government Service Tax"], correct:1, marks:1, neg:0},
-            {q:"GSTR-1 is a return for reporting:", opts:["Purchases","Outward supplies (sales)","TDS","Refunds"], correct:1, marks:1, neg:0},
-            {q:"GSTR-3B is primarily a:", opts:["Annual return","Monthly summary return","Refund form","Registration form"], correct:1, marks:1, neg:0},
-            {q:"Input Tax Credit (ITC) allows a taxpayer to:", opts:["Avoid filing","Set off tax paid on purchases against output tax","Skip payment","Get a loan"], correct:1, marks:1, neg:0},
-            {q:"The threshold turnover for regular GST registration for goods (most states) is:", opts:["Rs 10 lakh","Rs 40 lakh","Rs 1 crore","Rs 5 lakh"], correct:1, marks:1, neg:0},
-            {q:"A GSTIN is how many characters long?", opts:["10","12","15","16"], correct:2, marks:1, neg:0},
-            {q:"Which return is the annual GST return?", opts:["GSTR-1","GSTR-3B","GSTR-9","GSTR-2A"], correct:2, marks:1, neg:0},
-            {q:"The composition scheme is meant for:", opts:["Large companies","Small taxpayers with lower turnover","Exporters only","Government bodies"], correct:1, marks:1, neg:0},
-            {q:"HSN code is used to classify:", opts:["Services only","Goods","Taxpayers","States"], correct:1, marks:1, neg:0}
-          ]} }]
-      },
-      {
-        id:"itr", title:"Income Tax ITR Filing Course", tag:"Certificate Program",
-        school:"MiyeeUpskill School of Taxation",
-        duration:"6 Weeks", credits:6, level:"Professional",
-        desc:"Learn to file Income Tax Returns (ITR) in India end-to-end — income heads, deductions, regime selection, Form 16 and 26AS, capital gains, and e-filing of ITR-1 to ITR-4 with practical examples.",
-        semesters:[{ id:"itr_s1", name:"Module 1 — Income Tax & ITR Filing", modules:[
-          {id:"itr_m1", name:"Income Tax Basics", lessons:[
-            {id:"itr_l1", title:"Income Tax Framework, FY & AY", type:"video", mins:20, video:"", body:"Understand the Income Tax Act structure, financial year vs assessment year, and residential status."},
-            {id:"itr_l2", title:"The Five Heads of Income", type:"video", mins:24, video:"", body:"Salary, house property, business/profession, capital gains, and income from other sources explained with examples."},
-            {id:"itr_l3", title:"Deductions (80C, 80D & others) and Regimes", type:"video", mins:22, video:"", body:"Chapter VI-A deductions and choosing between the old and new tax regimes."}
+          {id:"su_m2", name:"Customer Discovery", lessons:[
+            {id:"su_l3", title:"The Mom Test: How to Talk to Customers", type:"video", mins:24, video:"", body:"Learn the Mom Test methodology: how to ask questions that get honest answers instead of polite lies, even from people who love you."},
+            {id:"su_l4", title:"Running Your First 10 Customer Interviews", type:"video", mins:22, video:"", body:"A practical playbook for finding, scheduling, and running discovery interviews, including what to listen for."},
+            {id:"su_w2", title:"Worksheet: Customer Discovery Interview Log", type:"worksheet", mins:35, video:"", body:"Log at least 5 customer discovery conversations. Fill this in after each interview, be honest about what you heard, not what you hoped to hear.", fields:[
+        {label:"Interviewee name/role and how you found them", hint:"Context of the interview", rows:2},
+        {label:"What did they say about the problem, in their own words?", hint:"Direct quotes are best", rows:3},
+        {label:"What do they currently do about this problem?", hint:"Current alternative or workaround", rows:2},
+        {label:"Did they express willingness to pay? What did they say?", hint:"Direct evidence of demand", rows:3},
+        {label:"Key surprises or insights from this conversation", hint:"What changed your thinking", rows:3},
+        {label:"Overall: does this interview support or challenge your hypothesis?", hint:"Support / Challenge / Neutral, and why", rows:2}
+      ]}
           ]},
-          {id:"itr_m2", name:"Filing the Return", lessons:[
-            {id:"itr_l4", title:"Reading Form 16 & Form 26AS / AIS", type:"video", mins:22, video:"", body:"How to read Form 16, the 26AS tax credit statement, and the Annual Information Statement (AIS)."},
-            {id:"itr_l5", title:"Choosing the Right ITR Form (ITR-1 to ITR-4)", type:"video", mins:20, video:"", body:"Selecting the correct ITR form based on income sources and taxpayer category."},
-            {id:"itr_l6", title:"Capital Gains & Reporting", type:"video", mins:24, video:"", body:"Computing short-term and long-term capital gains on shares, mutual funds and property."},
-            {id:"itr_l7", title:"E-Filing, Verification & Refunds", type:"reading", mins:22, video:"", body:"Filing on the income tax portal, e-verification, tracking refunds, and revised returns."}
+          {id:"su_m3", name:"Building the Lean Canvas", lessons:[
+            {id:"su_l5", title:"Lean Canvas Explained (Block by Block)", type:"video", mins:26, video:"", body:"A full walkthrough of the Lean Canvas: Problem, Customer Segments, UVP, Solution, Channels, Revenue, Cost, Key Metrics, and Unfair Advantage."},
+            {id:"su_w3", title:"Worksheet: Lean Canvas", type:"worksheet", mins:40, video:"", body:"Complete your Lean Canvas. This is a living document, you will revisit and revise it as you learn more.", fields:[
+        {label:"Problem (top 1-3 problems)", hint:"What are the biggest pains?", rows:3},
+        {label:"Customer Segments (target customers)", hint:"Who exactly are you building for?", rows:3},
+        {label:"Unique Value Proposition", hint:"Single clear message that states why you are different and worth paying attention to", rows:3},
+        {label:"Solution (top 3 features)", hint:"Outline of the solution to the problems above", rows:3},
+        {label:"Channels (path to customers)", hint:"How will you reach your customers?", rows:2},
+        {label:"Revenue Streams", hint:"How will you make money?", rows:2},
+        {label:"Cost Structure", hint:"Major costs to build and run this", rows:2},
+        {label:"Key Metrics", hint:"The numbers that tell you if the business is working", rows:2},
+        {label:"Unfair Advantage", hint:"Something that cannot be easily copied or bought", rows:2}
+      ]}
           ]}
-        ], assessment:{ title:"ITR Filing Assessment", passMark:50, durationMins:15, questions:[
-            {q:"ITR stands for:", opts:["Income Tax Refund","Income Tax Return","Indian Tax Rule","Income Total Report"], correct:1, marks:1, neg:0},
-            {q:"The Indian financial year runs from:", opts:["Jan to Dec","April to March","July to June","Oct to Sept"], correct:1, marks:1, neg:0},
-            {q:"Which ITR form is typically used by a salaried individual with one house property?", opts:["ITR-1 (Sahaj)","ITR-4","ITR-6","ITR-7"], correct:0, marks:1, neg:0},
-            {q:"Form 16 is issued by:", opts:["The bank","The employer","The IT department","The auditor"], correct:1, marks:1, neg:0},
-            {q:"Section 80C allows deduction up to:", opts:["Rs 50,000","Rs 1,50,000","Rs 2,00,000","Rs 5,00,000"], correct:1, marks:1, neg:0},
-            {q:"The 'Assessment Year' is the year:", opts:["Income is earned","Income is assessed/taxed (following the FY)","Of registration","Of refund"], correct:1, marks:1, neg:0},
-            {q:"TDS stands for:", opts:["Tax Deducted at Source","Total Due Sum","Tax Deposit Scheme","Total Deduction Statement"], correct:0, marks:1, neg:0},
-            {q:"Form 26AS is a:", opts:["Salary slip","Consolidated tax credit statement","Refund form","Registration form"], correct:1, marks:1, neg:0},
-            {q:"Which head covers salary, house property, business, capital gains and other sources?", opts:["GST heads","Heads of Income","Tax slabs","Deductions"], correct:1, marks:1, neg:0},
-            {q:"Long-term capital gains on listed equity above Rs 1 lakh are taxed at:", opts:["5%","10%","20%","30%"], correct:1, marks:1, neg:0}
-          ]} }]
-      },
-      {
-        id:"fcra", title:"FCRA Compliance Course", tag:"Certificate Program",
-        school:"MiyeeUpskill School of Compliance",
-        duration:"4 Weeks", credits:4, level:"Professional",
-        desc:"A focused course on Foreign Contribution (Regulation) Act (FCRA) compliance for NGOs and non-profits — registration, designated bank accounts, utilisation rules, record-keeping, and annual return (FC-4) filing.",
-        semesters:[{ id:"fcra_s1", name:"Module 1 — FCRA Compliance Essentials", modules:[
-          {id:"fcra_m1", name:"FCRA Framework", lessons:[
-            {id:"fcra_l1", title:"Introduction to FCRA & Applicability", type:"video", mins:20, video:"", body:"What FCRA is, why it exists, who it applies to, and the role of the Ministry of Home Affairs."},
-            {id:"fcra_l2", title:"Registration & Prior Permission", type:"video", mins:22, video:"", body:"Eligibility, the registration process, prior permission route, and validity/renewal."},
-            {id:"fcra_l3", title:"Designated FCRA Bank Account & Receipt Rules", type:"video", mins:20, video:"", body:"The SBI designated account requirement, receiving foreign contributions, and prohibited sources."}
+        ], assessment:{ title:"Semester 1 Assessment: Idea Validation", passMark:50, durationMins:15, questions:[
+            {q:"Idea validation primarily aims to test whether:", opts:["Your logo looks good","Real customers have the problem and will pay for a solution","You can code fast","Investors like the name"], correct:1, marks:1, neg:0},
+            {q:"The best early evidence that a problem is real comes from:", opts:["Assumptions","Talking directly to potential customers","Guessing","Competitor websites only"], correct:1, marks:1, neg:0},
+            {q:"A customer discovery interview should mostly involve you:", opts:["Pitching your solution","Listening and asking open questions about their problem","Selling immediately","Reading a script word for word"], correct:1, marks:1, neg:0},
+            {q:"A good problem validation question asks the customer to describe:", opts:["Your product","How they currently solve the problem today","Your pricing","Your competitors"], correct:1, marks:1, neg:0},
+            {q:"The Mom Test principle says you should avoid asking:", opts:["Specific past behaviour","Leading or hypothetical questions like would you use this","Open questions","Follow-up questions"], correct:1, marks:1, neg:0},
+            {q:"A target customer segment should be:", opts:["As broad as possible","Specific and well defined","Undefined until launch","Chosen randomly"], correct:1, marks:1, neg:0},
+            {q:"Willingness to pay is best validated by:", opts:["Asking if they like the idea","Asking for a pre-order, deposit, or commitment","Assuming yes","Skipping this step"], correct:1, marks:1, neg:0},
+            {q:"A Lean Canvas is a one-page tool used to:", opts:["Write a full business plan","Quickly map the key hypotheses of a business model","Design a logo","File taxes"], correct:1, marks:1, neg:0},
+            {q:"Which is NOT a block on a typical Lean Canvas?", opts:["Problem","Unique Value Proposition","Office furniture list","Revenue Streams"], correct:2, marks:1, neg:0},
+            {q:"Early-stage founders should treat their business model as:", opts:["Fixed and final","A set of hypotheses to test and refine","Irrelevant","Someone else's job"], correct:1, marks:1, neg:0}
+          ]} }, { id:"su_s2", name:"Semester 2: MVP, Skill Building & Mentorship Track", modules:[
+          {id:"su_m4", name:"Building Your MVP", lessons:[
+            {id:"su_l6", title:"MVP Strategies: Concierge, Wizard of Oz & No-Code", type:"video", mins:24, video:"", body:"Explore low-cost ways to test your solution before building the full product: concierge MVPs, Wizard of Oz testing, landing page tests, and no-code tools."},
+            {id:"su_l7", title:"Build-Measure-Learn in Practice", type:"video", mins:20, video:"", body:"How to run fast experiment cycles, define success metrics upfront, and avoid building features nobody asked for."},
+            {id:"su_w4", title:"Worksheet: MVP Scorecard", type:"worksheet", mins:30, video:"", body:"Define your MVP and how you will measure whether it succeeded.", fields:[
+        {label:"What is the riskiest assumption you are testing with this MVP?", hint:"The single biggest unknown", rows:3},
+        {label:"What is the simplest version you can build/launch this week?", hint:"Scope it down as much as possible", rows:3},
+        {label:"What does success look like? (specific metric and target)", hint:"e.g. 20 percent of users return within a week", rows:3},
+        {label:"What tools/no-code platforms will you use, if any?", hint:"List tools", rows:1},
+        {label:"What did you learn after running this test?", hint:"Fill in after launch", rows:3}
+      ]}
           ]},
-          {id:"fcra_m2", name:"Utilisation & Reporting", lessons:[
-            {id:"fcra_l4", title:"Utilisation Rules & Administrative Expense Cap", type:"video", mins:22, video:"", body:"Permitted uses of foreign contribution, the administrative expense limit, and prohibitions."},
-            {id:"fcra_l5", title:"Books of Account & Record-Keeping", type:"reading", mins:18, video:"", body:"Maintaining separate books for FC funds, asset registers, and audit requirements."},
-            {id:"fcra_l6", title:"Annual Return FC-4 Filing & Compliance Calendar", type:"video", mins:22, video:"", body:"Filing the annual FC-4 return, disclosures, due dates, and consequences of non-compliance."}
-          ]}
-        ], assessment:{ title:"FCRA Compliance Assessment", passMark:50, durationMins:12, questions:[
-            {q:"FCRA stands for:", opts:["Foreign Contribution Regulation Act","Financial Compliance Regulation Act","Foreign Currency Reserve Act","Federal Contribution Rules Act"], correct:0, marks:1, neg:0},
-            {q:"FCRA primarily regulates:", opts:["Domestic donations","Foreign contributions to Indian entities","Company taxes","Import duties"], correct:1, marks:1, neg:0},
-            {q:"Which ministry administers FCRA?", opts:["Ministry of Finance","Ministry of Home Affairs","Ministry of Corporate Affairs","RBI"], correct:1, marks:1, neg:0},
-            {q:"An organisation receiving foreign contribution must be:", opts:["Unregistered","Registered or have prior permission under FCRA","A company only","A trust only"], correct:1, marks:1, neg:0},
-            {q:"FCRA funds must be received in:", opts:["Any bank account","A designated FCRA bank account","Cash","A foreign account"], correct:1, marks:1, neg:0},
-            {q:"The annual FCRA return is filed in form:", opts:["FC-3","FC-6","FC-4","FC-1"], correct:0, marks:1, neg:0},
-            {q:"FCRA registration is generally valid for:", opts:["1 year","3 years","5 years","10 years"], correct:2, marks:1, neg:0},
-            {q:"Foreign contribution can be used for:", opts:["Any purpose","The defined purposes for which it was received","Personal use","Political funding"], correct:1, marks:1, neg:0},
-            {q:"Which of these is a key FCRA compliance requirement?", opts:["No records needed","Maintaining separate books of account for FC funds","Mixing funds","Cash withdrawals"], correct:1, marks:1, neg:0},
-            {q:"Administrative expenses out of FC funds are capped at (as per rules):", opts:["10%","20%","50%","No limit"], correct:1, marks:1, neg:0}
-          ]} }]
-      },
-      {
-        id:"fpa1", title:"Certificate Course on FP&A — Level 1", tag:"Certificate Program",
-        school:"MiyeeUpskill School of Finance",
-        duration:"8 Weeks", credits:8, level:"Professional",
-        desc:"An introduction to Financial Planning & Analysis (FP&A) — budgeting, forecasting, variance analysis, driver-based modelling, and management reporting. Build the core skills to support data-driven business decisions.",
-        semesters:[{ id:"fpa1_s1", name:"Module 1 — FP&A Foundations", modules:[
-          {id:"fpa_m1", name:"Planning & Budgeting", lessons:[
-            {id:"fpa_l1", title:"What is FP&A? Role & Value", type:"video", mins:20, video:"", body:"The role of FP&A in an organisation, how it differs from accounting, and the value it adds to decisions."},
-            {id:"fpa_l2", title:"Budgeting Fundamentals", type:"video", mins:24, video:"", body:"Types of budgets, the budgeting process, top-down vs bottom-up, and building an operating budget."},
-            {id:"fpa_l3", title:"Forecasting & Rolling Forecasts", type:"video", mins:22, video:"", body:"Forecasting techniques, assumptions, and maintaining a rolling forecast."}
+          {id:"su_m5", name:"Startup Internship & Mentorship Track", lessons:[
+            {id:"su_l8", title:"Working Like a Founder: Ownership & Accountability", type:"video", mins:18, video:"", body:"What real ownership looks like on a founding or intern team, including weekly goal setting and honest self-review."},
+            {id:"su_w5", title:"Worksheet: Weekly Founder Standup Log", type:"worksheet", mins:25, video:"", body:"Fill this in weekly during your mentorship track. Your mentor will review it and give feedback.", fields:[
+        {label:"This week's top 3 priorities", hint:"What did you commit to?", rows:3},
+        {label:"What did you actually accomplish?", hint:"Be honest, including what did not get done", rows:3},
+        {label:"Biggest blocker or challenge this week", hint:"What is slowing you down?", rows:2},
+        {label:"What do you need help with from your mentor?", hint:"Specific ask", rows:2},
+        {label:"Key metric this week (users, revenue, signups, etc.)", hint:"Track your core number", rows:2}
+      ]},
+            {id:"su_w6", title:"Worksheet: 1:1 Mentor Check-in Notes", type:"worksheet", mins:20, video:"", body:"Complete before each mentor meeting so your mentor can prepare and track your progress.", fields:[
+        {label:"Progress since last check-in", hint:"What moved forward?", rows:3},
+        {label:"Current biggest risk to the business", hint:"What could kill this if unresolved?", rows:2},
+        {label:"Decisions you need mentor input on", hint:"Specific questions", rows:2},
+        {label:"Goals for next check-in period", hint:"What you will commit to next", rows:2}
+      ]}
           ]},
-          {id:"fpa_m2", name:"Analysis & Reporting", lessons:[
-            {id:"fpa_l4", title:"Variance Analysis", type:"video", mins:22, video:"", body:"Comparing actuals to plan, understanding favourable/unfavourable variances, and driving action."},
-            {id:"fpa_l5", title:"Driver-Based Modelling Basics", type:"video", mins:24, video:"", body:"Linking financial outputs to business drivers to build flexible, insightful models."},
-            {id:"fpa_l6", title:"Management Reporting & KPIs", type:"video", mins:20, video:"", body:"Designing clear management reports and dashboards with meaningful KPIs."},
-            {id:"fpa_l7", title:"Introduction to the Three Financial Statements", type:"reading", mins:22, video:"", body:"How the P&L, balance sheet and cash flow connect — the foundation for any FP&A model."}
+          {id:"su_m6", name:"Pitching & Fundamentals", lessons:[
+            {id:"su_l9", title:"Unit Economics 101: CAC, LTV & Margins", type:"video", mins:24, video:"", body:"Learn to calculate and reason about customer acquisition cost, lifetime value, gross margin, and why these numbers matter to any investor."},
+            {id:"su_l10", title:"Crafting Your Pitch Deck", type:"video", mins:26, video:"", body:"A slide-by-slide breakdown of a great early-stage pitch deck: problem, solution, market, business model, traction, team, and ask."},
+            {id:"su_w7", title:"Worksheet: Pitch Deck Outline", type:"worksheet", mins:35, video:"", body:"Draft the content for each slide of your pitch deck in plain text before designing it visually.", fields:[
+        {label:"Problem slide: core content", hint:"1-2 sentences on the problem", rows:2},
+        {label:"Solution slide: core content", hint:"1-2 sentences on your solution", rows:2},
+        {label:"Market size slide: core content", hint:"TAM/SAM/SOM estimate and source", rows:3},
+        {label:"Business model slide: how you make money", hint:"Pricing and revenue model", rows:2},
+        {label:"Traction slide: evidence so far", hint:"Users, revenue, pilots, letters of intent", rows:3},
+        {label:"Team slide: why you", hint:"Relevant background of founders", rows:2},
+        {label:"The Ask: what you need and why", hint:"Funding amount, use of funds, or specific support needed", rows:3}
+      ]}
           ]}
-        ], assessment:{ title:"FP&A Level 1 Assessment", passMark:50, durationMins:18, questions:[
-            {q:"FP&A stands for:", opts:["Financial Planning & Analysis","Fiscal Policy & Audit","Fund Planning & Allocation","Forecasting Profit & Assets"], correct:0, marks:1, neg:0},
-            {q:"The primary purpose of FP&A is to:", opts:["File taxes","Support business decisions through planning, budgeting and analysis","Audit accounts","Register companies"], correct:1, marks:1, neg:0},
-            {q:"A budget is best described as:", opts:["A past record","A financial plan for a future period","A tax return","An invoice"], correct:1, marks:1, neg:0},
-            {q:"Variance analysis compares:", opts:["Two companies","Actual results against budget/forecast","Two years of tax","Assets and liabilities"], correct:1, marks:1, neg:0},
-            {q:"A rolling forecast is:", opts:["Fixed once a year","Continuously updated for future periods","Only historical","A tax form"], correct:1, marks:1, neg:0},
-            {q:"Which statement shows profitability over a period?", opts:["Balance sheet","Profit & Loss (Income) statement","Cash flow only","Trial balance"], correct:1, marks:1, neg:0},
-            {q:"CapEx refers to:", opts:["Daily expenses","Capital expenditure on long-term assets","Cash export","Capital exemption"], correct:1, marks:1, neg:0},
-            {q:"A key FP&A driver-based model links outputs to:", opts:["Random numbers","Business drivers/assumptions","Only last year","Tax rates"], correct:1, marks:1, neg:0},
-            {q:"EBITDA stands for earnings before interest, taxes, depreciation and:", opts:["Assets","Amortisation","Audit","Allocation"], correct:1, marks:1, neg:0},
-            {q:"A good KPI should be:", opts:["Vague","Measurable and aligned to objectives","Unrelated to goals","Secret"], correct:1, marks:1, neg:0}
+        ], assessment:{ title:"Semester 2 Assessment: MVP & Startup Fundamentals", passMark:50, durationMins:15, questions:[
+            {q:"MVP stands for:", opts:["Most Valuable Player","Minimum Viable Product","Maximum Value Proposition","Main Venture Plan"], correct:1, marks:1, neg:0},
+            {q:"The main goal of an MVP is to:", opts:["Impress investors with features","Test your riskiest assumption with the least effort","Build the final product","Copy a competitor exactly"], correct:1, marks:1, neg:0},
+            {q:"A 'concierge MVP' means you:", opts:["Manually deliver the service yourself before automating","Hire a concierge company","Skip validation entirely","Only sell to hotels"], correct:0, marks:1, neg:0},
+            {q:"Which is a sign you should pivot?", opts:["Customers love the product and keep paying","Repeated evidence that customers do not want what you built","You are slightly behind schedule","A competitor raised funding"], correct:1, marks:1, neg:0},
+            {q:"A internship or apprenticeship track for a startup team should focus on:", opts:["Busywork with no real ownership","Real projects with mentorship and clear learning goals","Only coffee runs","Unrelated tasks"], correct:1, marks:1, neg:0},
+            {q:"Pitching to a mentor is valuable mainly because it:", opts:["Wastes time","Forces clarity and surfaces gaps in your thinking","Guarantees funding","Is only for later stage startups"], correct:1, marks:1, neg:0},
+            {q:"Unit economics primarily examine:", opts:["Office unit costs","Revenue and cost per single customer or transaction","Number of employees","Marketing colours"], correct:1, marks:1, neg:0},
+            {q:"Customer Acquisition Cost (CAC) is:", opts:["Total revenue","The cost to acquire one paying customer","The cost of your product","Office rent"], correct:1, marks:1, neg:0},
+            {q:"Lifetime Value (LTV) should ideally be:", opts:["Lower than CAC","Significantly higher than CAC","Equal to zero","Unrelated to CAC"], correct:1, marks:1, neg:0},
+            {q:"A good pitch deck typically includes all of these EXCEPT:", opts:["Problem and solution","Market size","Your personal grocery list","Team and traction"], correct:2, marks:1, neg:0}
           ]} }]
       }
     ],
     /* progress + attempts keyed by studentId -> courseId */
     progress:{},  // {studentId:{courseId:{done:[lessonIds]}}}
-    attempts:{}   // {studentId:{courseId:{...attempt}}}
+    attempts:{},  // {studentId:{courseId:{...attempt}}}
+    worksheets:{} // {studentId:{lessonId:{answers,status,mentorNote,reviewed,submittedAt}}}
   };
 }
 
-const BUILD_BRAND = "miyeeupskill-2025";
+const BUILD_BRAND = "miyeeupskill-startup-v4";
 let DB = loadDB();
 // If there's no data, OR the saved data is from an older/other brand build,
 // reseed so the correct MiyeeUpskill accounts and courses always exist.
@@ -587,17 +579,21 @@ function render(){
   if(r==="login") return renderLogin();
   if(r==="signup") return renderSignup();
   if(!S.user) return renderLogin();
-  if(r==="dashboard") return renderDashboard();
-  if(r==="catalogue") return renderCatalogue();
-  if(r==="account") return renderAccount();
-  if(r==="course") return renderCourse();
-  if(r==="lesson") return renderLesson();
-  if(r==="quiz") return renderQuiz();
-  if(r==="result") return renderResult();
-  if(r==="marksheet") return renderMarksheet();
-  if(r==="certificate") return renderCertificate();
-  if(r==="admin") return renderAdmin();
-  return renderLogin();
+  if(r==="dashboard") renderDashboard();
+  else if(r==="catalogue") renderCatalogue();
+  else if(r==="account") renderAccount();
+  else if(r==="course") renderCourse();
+  else if(r==="lesson") renderLesson();
+  else if(r==="quiz") renderQuiz();
+  else if(r==="result") renderResult();
+  else if(r==="marksheet") renderMarksheet();
+  else if(r==="certificate") renderCertificate();
+  else if(r==="admin") renderAdmin();
+  else return renderLogin();
+  const el=app();
+  if(el && !el.querySelector('.dev-credit')){
+    el.insertAdjacentHTML('beforeend','<div class="dev-credit no-print">Developed by Vipin Nair</div>');
+  }
 }
 
 function topbar(){
@@ -621,39 +617,37 @@ function topbar(){
 let loginRole='student';
 function renderLogin(){
   const signupLink = DB.settings.allowSignup!==false
-    ? `<div style="text-align:center;margin-top:16px;font-size:14px">New student? <a onclick="go('signup')" style="font-weight:600">Create an account →</a></div>`
+    ? `<div style="text-align:center;margin-top:16px;font-size:14px">New founder? <a onclick="go('signup')" style="font-weight:600">Create an account →</a></div>`
     : '';
   app().innerHTML=`<div class="login-wrap"><div class="login-card">
     <div class="login-left">
       <span class="lg-logo"><img src="${LOGO}"></span>
-      <h1>Learn. Assess. Get Certified.</h1>
-      <p>Practical, career-focused finance &amp; compliance courses with online assessments and verifiable certificates.</p>
-      <ul><li>Self-paced short-term certificate programmes</li><li>Semester online assessments with instant results</li><li>Printable marksheet &amp; official certificate</li><li>Career-focused finance &amp; compliance skills</li></ul>
+      <h1>Validate. Build. Pitch.</h1>
+      <p>A mentor-guided programme for early-stage founders, covering idea validation, customer discovery, MVP building and pitching.</p>
+      <ul><li>YC-style founder worksheets, reviewed by mentors</li><li>Semester assessments with instant results</li><li>Printable marksheet and verifiable certificate</li><li>A structured path from idea to pitch</li></ul>
     </div>
     <div class="login-right">
       <h2>Sign in to continue</h2>
-      <div class="sub">Access your courses, assessments and certificates.</div>
+      <div class="sub">Access your programme, worksheets and mentor feedback.</div>
       <div class="role-tabs">
-        <button id="rt-s" class="active" onclick="setRole('student')">Student</button>
-        <button id="rt-a" onclick="setRole('admin')">Administrator</button>
+        <button id="rt-s" class="active" onclick="setRole('student')">Founder</button>
+        <button id="rt-a" onclick="setRole('admin')">Mentor / Admin</button>
       </div>
       <div class="field"><label>Email</label><input id="in-email" placeholder="you@email.com"></div>
       <div class="field"><label>Password</label><input id="in-pass" type="password" placeholder="••••••••"></div>
       <button class="btn" style="width:100%;padding:12px;font-size:15px" onclick="doLogin()">Sign In →</button>
       <div id="login-err"></div>
       <div id="signup-link">${signupLink}</div>
-      <div class="hint" id="login-hint">🔑 <b>Demo student:</b> rahul@student.miyee.com / demo1234</div>
-      <div style="text-align:center;margin-top:8px"><a onclick="resetLoginData()" style="font-size:11px;color:var(--muted)">Trouble signing in? Reset demo data</a></div>
+      <div style="text-align:center;margin-top:14px"><a onclick="resetLoginData()" style="font-size:11px;color:var(--muted)">Trouble signing in? Reset to defaults</a></div>
     </div>
-  </div></div>`;
+  </div>
+  <div style="text-align:center;padding:16px 0 0;font-size:11.5px;color:rgba(255,255,255,.6)">Developed by Vipin Nair</div>
+  </div>`;
 }
 function setRole(r){
   loginRole=r;
   document.getElementById('rt-s').classList.toggle('active',r==='student');
   document.getElementById('rt-a').classList.toggle('active',r==='admin');
-  document.getElementById('login-hint').innerHTML = r==='admin'
-    ? '🔑 <b>Admin:</b> admin@miyeeupskill.com / Miyee@2025'
-    : '🔑 <b>Demo student:</b> rahul@student.miyee.com / demo1234';
   const sl=document.getElementById('signup-link');
   if(sl) sl.style.display = r==='admin' ? 'none' : 'block';
   const e=document.getElementById('login-err'); if(e) e.innerHTML='';
@@ -662,23 +656,24 @@ function doLogin(){
   const email=(document.getElementById('in-email').value||'').trim().toLowerCase();
   const pass=(document.getElementById('in-pass').value||'');
   const errBox=document.getElementById('login-err');
-  if(loginRole==='admin'){
-    const a=DB.admins.find(x=>x.email.toLowerCase()===email&&x.pass===pass);
-    if(!a){ errBox.innerHTML='<div class="err">Invalid admin credentials.</div>'; return; }
-    S.user={name:a.name,email:a.email}; S.role='admin'; S.adminTab='dashboard'; go('admin');
-  }else{
-    const s=DB.students.find(x=>x.email.toLowerCase()===email&&x.pass===pass);
-    if(!s){ errBox.innerHTML='<div class="err">Invalid email or password.</div>'; return; }
-    S.user=s; S.role='student'; go('dashboard');
-  }
+  // Check both admin and student lists, this way, even if the tab selection
+  // is out of sync with what the person typed, a correct email+password never
+  // produces a false "invalid" error.
+  const admin=DB.admins.find(x=>x.email.toLowerCase()===email&&x.pass===pass);
+  const student=DB.students.find(x=>x.email.toLowerCase()===email&&x.pass===pass);
+  if(loginRole==='admin' && admin){ S.user={name:admin.name,email:admin.email}; S.role='admin'; S.adminTab='dashboard'; go('admin'); }
+  else if(loginRole!=='admin' && student){ S.user=student; S.role='student'; go('dashboard'); }
+  else if(admin){ S.user={name:admin.name,email:admin.email}; S.role='admin'; S.adminTab='dashboard'; go('admin'); }
+  else if(student){ S.user=student; S.role='student'; go('dashboard'); }
+  else{ errBox.innerHTML='<div class="err">Invalid email or password.</div>'; return; }
   toast('Welcome, '+S.user.name);
 }
-function logout(){ S.user=null;S.role=null;S.quiz=null;go('login'); }
+function logout(){ S.user=null;S.role=null;S.quiz=null;loginRole='student';go('login'); }
 function resetLoginData(){
   if(!confirm('Reset to fresh demo data? This clears any locally saved courses/students on this device and restores the default MiyeeUpskill demo accounts.')) return;
   try{ localStorage.removeItem(SK); }catch(e){}
   DB=migrateDB(seedDB()); DB._brand=BUILD_BRAND; saveDB();
-  toast('Demo data reset ✓ — use the credentials shown');
+  toast('Demo data reset. Please use your account credentials.');
   go('login');
 }
 
@@ -718,7 +713,7 @@ function doSignup(){
   }
   const student={id:nextStudentId(),name,email,pass,phone,govId:gov,photo:"",admitDate:today(),enrolled:[]};
   DB.students.push(student);
-  if(!saveDB()){ err.innerHTML='<div class="err">Could not save — storage may be full.</div>'; return; }
+  if(!saveDB()){ err.innerHTML='<div class="err">Could not save, storage may be full.</div>'; return; }
   S.user=student; S.role='student';
   toast('Account created! Welcome, '+name);
   go('catalogue');
@@ -774,7 +769,7 @@ function renderCatalogue(){
         <p style="font-size:13px;color:#334;margin-bottom:12px">${esc((c.desc||'').slice(0,120))}${(c.desc||'').length>120?'…':''}</p>
         <div class="course-meta"><span>⏱ ${esc(c.duration)}</span><span>📘 ${c.credits} Credits</span><span>🎓 ${sems.length} Sem</span></div>
         ${enrolled
-          ? `<button class="btn btn-ghost" onclick="openCourse('${c.id}')" style="margin-top:auto">✓ Enrolled — Open →</button>`
+          ? `<button class="btn btn-ghost" onclick="openCourse('${c.id}')" style="margin-top:auto">Enrolled, Open</button>`
           : `<button class="btn btn-gold" onclick="enrolSelf('${c.id}')" style="margin-top:auto">Enrol Now →</button>`}
       </div></div>`;
   }).join('');
@@ -806,7 +801,7 @@ function renderAccount(){
     <div class="two-col"><div>
       <div class="card" style="margin-bottom:20px"><div class="card-h">Profile</div><div class="card-b">
         <div class="field"><label>Full Name</label><input id="ac-name" value="${esc(s.name)}"></div>
-        <div class="field row2"><div><label>Email (login) — cannot be changed</label><input value="${esc(s.email)}" disabled style="background:var(--jgu-light)"></div><div><label>Enrolment ID</label><input value="${esc(s.id)}" disabled style="background:var(--jgu-light)"></div></div>
+        <div class="field row2"><div><label>Email (login, cannot be changed)</label><input value="${esc(s.email)}" disabled style="background:var(--jgu-light)"></div><div><label>Enrolment ID</label><input value="${esc(s.id)}" disabled style="background:var(--jgu-light)"></div></div>
         <div class="field row2"><div><label>Phone</label><input id="ac-phone" value="${esc(s.phone||'')}"></div><div><label>Govt ID No. (for certificate)</label><input id="ac-gov" value="${esc(s.govId||'')}"></div></div>
         <div class="field"><label>Student Photo (for certificate)</label><input type="file" accept="image/*" onchange="acPhoto(this)">${s.photo?`<div style="margin-top:8px"><img src="${s.photo}" style="height:70px;border:1px solid var(--border);border-radius:6px"></div>`:''}</div>
         <button class="btn btn-gold" onclick="saveAccount()">Save Profile</button>
@@ -869,17 +864,22 @@ function renderCourse(){
       const lessons=(m.lessons||[]).map(l=>{
         const isDone=done.includes(l.id);
         const click = unlocked ? `onclick="openLesson('${l.id}')"` : '';
-        return `<div class="lesson ${isDone?'done':''}" ${click} style="${unlocked?'':'opacity:.5;cursor:not-allowed'}">
-          <div class="ic">${isDone?'✓':(l.type==='video'?'▶':'📄')}</div>
-          <div class="lt"><b>${esc(l.title)}</b><span>${l.type==='video'?'Video':'Reading'} · ${l.mins} min</span></div>
-          <div class="lk">${unlocked?(isDone?'Review':'Start'):'🔒'}</div></div>`;
+        const isWs=l.type==='worksheet';
+        const wsResp=isWs?getWorksheetResponse(s.id,l.id):null;
+        const ic=isWs?'📝':(l.type==='video'?'▶':'📄');
+        const label=isWs?(wsResp?(wsResp.reviewed?'Reviewed':'Submitted'):'Worksheet'):(l.type==='video'?'Video':'Reading');
+        const statusIc=isWs?(wsResp?(wsResp.reviewed?'✓':'📤'):ic):(isDone?'✓':ic);
+        return `<div class="lesson ${isDone||wsResp?'done':''}" ${click} style="${unlocked?'':'opacity:.5;cursor:not-allowed'}">
+          <div class="ic">${statusIc}</div>
+          <div class="lt"><b>${esc(l.title)}</b><span>${label} · ${l.mins} min</span></div>
+          <div class="lk">${unlocked?(wsResp?(wsResp.reviewed?'View':'Edit'):(isDone?'Review':'Start')):'🔒'}</div></div>`;
       }).join('');
       return `<div class="module"><div class="module-h">${esc(m.name)}<span class="mstat">${md}/${(m.lessons||[]).length} complete</span></div>${lessons}</div>`;
     }).join('') || '<div style="padding:12px;color:var(--muted);font-size:13px">No lessons in this semester yet.</div>';
     // semester action row
     let action;
     if(!unlocked){
-      action=`<span class="pill gray">🔒 Locked — pass previous semester first</span>`;
+      action=`<span class="pill gray">🔒 Locked, pass previous semester first</span>`;
     }else if(att){
       action=`<span class="pill ${att.passed?'green':'red'}">${att.passed?'Passed':'Failed'} · ${att.pct}%</span>
         <button class="btn btn-ghost btn-sm" onclick="viewSemMarksheet('${c.id}','${sem.id}')">📋 Marksheet</button>
@@ -928,7 +928,7 @@ function renderCourse(){
 /* ---------- LESSON (real video) ---------- */
 function openLesson(lid){ S.lessonId=lid; go('lesson'); }
 function videoEmbed(l){
-  if(!l.video) return `<div class="video-ph"><div class="play-btn">▶</div><div style="font-size:13px;opacity:.7">${l.type==='video'?'Lecture Video':'Reading Material'} · ${l.mins} min</div><div style="font-size:11px;opacity:.5">No video uploaded yet — admin can add one</div></div>`;
+  if(!l.video) return `<div class="video-ph"><div class="play-btn">▶</div><div style="font-size:13px;opacity:.7">${l.type==='video'?'Lecture Video':'Reading Material'} · ${l.mins} min</div><div style="font-size:11px;opacity:.5">No video uploaded yet. Admin can add one</div></div>`;
   const v=l.video.trim();
   const yt=v.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
   if(yt) return `<div class="vwrap"><iframe src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe></div>`;
@@ -936,12 +936,63 @@ function videoEmbed(l){
   if(vm) return `<div class="vwrap"><iframe src="https://player.vimeo.com/video/${vm[1]}" allowfullscreen></iframe></div>`;
   return `<div class="vwrap"><video src="${esc(v)}" controls></video></div>`;
 }
+
+/* ---- Worksheet response storage: DB.worksheets[studentId][lessonId] = {answers:{fieldId:text}, status, mentorNote, submittedAt} ---- */
+function getWorksheetResponse(sid,lid){ return (DB.worksheets&&DB.worksheets[sid]&&DB.worksheets[sid][lid]) || null; }
+function saveWorksheetResponse(sid,lid,answers,status){
+  DB.worksheets=DB.worksheets||{};
+  DB.worksheets[sid]=DB.worksheets[sid]||{};
+  const prior=DB.worksheets[sid][lid]||{};
+  DB.worksheets[sid][lid]={answers, status:status||'submitted', mentorNote:prior.mentorNote||'', reviewed:prior.reviewed||false, submittedAt:today()};
+  saveDB();
+}
+function allWorksheetLessons(){
+  const out=[];
+  DB.courses.forEach(c=>courseSemesters(c).forEach(sem=>(sem.modules||[]).forEach(m=>(m.lessons||[]).forEach(l=>{
+    if(l.type==='worksheet') out.push({course:c, sem, mod:m, lesson:l});
+  }))));
+  return out;
+}
+
 function renderLesson(){
   const s=S.user, c=findCourse(S.courseId), all=flatLessons(c);
   const idx=all.findIndex(l=>l.id===S.lessonId), l=all[idx];
-  const paras=esc(l.body).split('\n\n').map(p=>`<p>${p}</p>`).join('');
   const prev=idx>0?all[idx-1]:null, next=idx<all.length-1?all[idx+1]:null;
   const done=getProgress(s.id,c.id).done;
+  const sideNav=`<div><div class="side-card"><h4>Lessons</h4>
+      ${all.map((x,i)=>{const d=done.includes(x.id);const ic=x.type==='worksheet'?'📝':(d?'✓':(i+1)+'.');return `<div class="side-stat" style="cursor:pointer;${x.id===l.id?'font-weight:700;color:var(--jgu-navy)':''}" onclick="openLesson('${x.id}')"><span>${ic} ${esc(x.title).slice(0,24)}${x.title.length>24?'…':''}</span></div>`;}).join('')}
+    </div></div>`;
+
+  if(l.type==='worksheet'){
+    const resp=getWorksheetResponse(s.id,l.id);
+    const fields=(l.fields||[]).map((f,fi)=>{
+      const val=resp?.answers?.[fi]||'';
+      return `<div class="field"><label>${esc(f.label)}${f.hint?` <span style="font-weight:400;color:var(--muted)">(${esc(f.hint)})</span>`:''}</label><textarea id="wf-${fi}" rows="${f.rows||3}" placeholder="${esc(f.placeholder||'')}">${esc(val)}</textarea></div>`;
+    }).join('');
+    const statusPill = resp
+      ? `<span class="pill ${resp.reviewed?'green':'amber'}">${resp.reviewed?'✓ Reviewed by mentor':'Submitted, awaiting review'}</span>`
+      : `<span class="pill gray">Not yet submitted</span>`;
+    const mentorFeedback = resp?.mentorNote
+      ? `<div class="card" style="margin-top:16px;border-color:var(--jgu-accent)"><div class="card-h" style="background:#fef8ec">🧑‍🏫 Mentor Feedback</div><div class="card-b" style="white-space:pre-wrap">${esc(resp.mentorNote)}</div></div>`
+      : '';
+    app().innerHTML=topbar()+`<div class="app-shell">
+      <div class="crumb"><a onclick="go('dashboard')">Dashboard</a> / <a onclick="openCourse('${c.id}')">${esc(c.title)}</a> / ${esc(l.title)}</div>
+      <div class="two-col"><div class="viewer">
+        <div class="lesson-body">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><h2 style="margin-bottom:0">📝 ${esc(l.title)}</h2>${statusPill}</div>
+          <p style="color:#334">${esc(l.body)}</p>
+          <div style="margin-top:18px">${fields||'<p style="color:var(--muted)">No fields configured for this worksheet yet.</p>'}</div>
+          ${mentorFeedback}
+        </div>
+        <div class="lesson-nav">
+          ${prev?`<button class="btn btn-ghost" onclick="openLesson('${prev.id}')">← Previous</button>`:`<span></span>`}
+          <button class="btn btn-gold" onclick="submitWorksheet('${l.id}')">${resp?'Update & Resubmit':'Submit Worksheet'} ✓</button>
+        </div>
+      </div>${sideNav}</div></div>`;
+    return;
+  }
+
+  const paras=esc(l.body).split('\n\n').map(p=>`<p>${p}</p>`).join('');
   app().innerHTML=topbar()+`<div class="app-shell">
     <div class="crumb"><a onclick="go('dashboard')">Dashboard</a> / <a onclick="openCourse('${c.id}')">${esc(c.title)}</a> / ${esc(l.title)}</div>
     <div class="two-col"><div class="viewer">
@@ -951,9 +1002,22 @@ function renderLesson(){
         ${prev?`<button class="btn btn-ghost" onclick="openLesson('${prev.id}')">← Previous</button>`:`<span></span>`}
         <button class="btn btn-gold" onclick="completeLesson('${l.id}')">Mark Complete &amp; Continue ✓</button>
       </div>
-    </div><div><div class="side-card"><h4>Lessons</h4>
-      ${all.map((x,i)=>{const d=done.includes(x.id);return `<div class="side-stat" style="cursor:pointer;${x.id===l.id?'font-weight:700;color:var(--jgu-navy)':''}" onclick="openLesson('${x.id}')"><span>${d?'✓':(i+1)+'.'} ${esc(x.title).slice(0,24)}${x.title.length>24?'…':''}</span></div>`;}).join('')}
-    </div></div></div></div>`;
+    </div>${sideNav}</div></div>`;
+}
+function submitWorksheet(lid){
+  const s=S.user, c=findCourse(S.courseId);
+  const all=flatLessons(c); const l=all.find(x=>x.id===lid);
+  const answers={};
+  (l.fields||[]).forEach((f,fi)=>{ const el=document.getElementById('wf-'+fi); answers[fi]=el?el.value:''; });
+  const filled=Object.values(answers).filter(v=>v.trim()).length;
+  if(filled===0){ toast('Please fill in at least one field before submitting','err'); return; }
+  saveWorksheetResponse(s.id,lid,answers,'submitted');
+  setLessonDone(s.id,c.id,lid);
+  toast('Worksheet submitted ✓ Your mentor will review it');
+  const sems=courseSemesters(c);
+  let semOf=null, semLes=null, li=-1;
+  for(const sem of sems){ const ls=semLessons(sem); const k=ls.findIndex(x=>x.id===lid); if(k>=0){ semOf=sem; semLes=ls; li=k; break; } }
+  if(semOf && li<semLes.length-1) openLesson(semLes[li+1].id); else openCourse(c.id);
 }
 function completeLesson(lid){
   const s=S.user, c=findCourse(S.courseId);
@@ -967,6 +1031,7 @@ function completeLesson(lid){
 }
 </script>
 <script>
+
 /* ============================================================
    QUIZ ENGINE + RESULT + MARKSHEET + CERTIFICATE
    ============================================================ */
@@ -983,7 +1048,7 @@ function startTimer(){
     q.timeLeft--;
     const el=document.getElementById('timer-val');
     if(el){ el.textContent=fmtTime(q.timeLeft); if(q.timeLeft<=60) document.getElementById('timer-box').classList.add('warn'); }
-    if(q.timeLeft<=0){ clearInterval(q.timerId); toast('⏰ Time up — submitting'); submitQuiz(); }
+    if(q.timeLeft<=0){ clearInterval(q.timerId); toast('Time up, submitting'); submitQuiz(); }
   },1000);
 }
 function fmtTime(s){ const m=Math.floor(s/60),ss=s%60; return `${m}:${ss<10?'0':''}${ss}`; }
@@ -993,7 +1058,7 @@ function renderQuiz(){
   const palette=A.questions.map((_,i)=>`<button class="${q.answers[i]!==undefined?'answered':''} ${i===q.idx?'current':''}" onclick="jump(${i})">${i+1}</button>`).join('');
   const answered=Object.keys(q.answers).length;
   app().innerHTML=topbar()+`<div class="app-shell">
-    <div class="quiz-head"><div><h1>${esc(sem.name)} — ${esc(A.title)}</h1><div class="qmeta">${esc(c.title)} · ${A.questions.length} questions · Pass ${A.passMark}%</div></div>
+    <div class="quiz-head"><div><h1>${esc(sem.name)} - ${esc(A.title)}</h1><div class="qmeta">${esc(c.title)} · ${A.questions.length} questions · Pass ${A.passMark}%</div></div>
       <div class="timer" id="timer-box"><div class="t" id="timer-val">${fmtTime(q.timeLeft)}</div><div class="l">TIME REMAINING</div></div></div>
     <div class="q-card"><div class="q-num">QUESTION ${q.idx+1} OF ${A.questions.length}</div><div class="q-text">${esc(qn.q)}</div>${opts}</div>
     <div class="quiz-foot"><div><div style="font-size:12px;color:var(--muted);margin-bottom:6px">${answered}/${A.questions.length} answered</div><div class="q-palette">${palette}</div></div>
@@ -1078,7 +1143,7 @@ function renderMarksheet(){
     <div class="action-bar no-print"><button class="btn btn-gold" onclick="window.print()">🖨 Print / Save PDF</button><button class="btn btn-ghost" onclick="openCourse('${c.id}')">← Course</button></div>
     <div class="sheet">
       <div class="sheet-head"><img src="${LOGO}"><div class="sh-txt"><h2>${esc(DB.settings.universityName)}</h2><p>${esc(DB.settings.universitySub)} · Online Learning Division</p></div></div>
-      <div class="sheet-title">STATEMENT OF MARKS — ${esc(sem.name).toUpperCase()}</div>
+      <div class="sheet-title">STATEMENT OF MARKS - ${esc(sem.name).toUpperCase()}</div>
       <div class="sheet-body">
         <div class="info-grid">
           <div class="r"><span>Student Name</span><b>${esc(s.name)}</b></div>
@@ -1120,7 +1185,7 @@ function renderCertificate(){
   const govBlock = st.showGovId!==false ? `<div class="cert-idblock">Identification Number (Voter ID card Number / Passport Number / Driving License Number / Any other Govt ID proof Number):<span>${esc(s.govId||'________________________')}</span></div>` : '';
   const verifyLine = st.showVerify!==false ? `<div class="cert-verify">Certificate ID: ${a.certId} · Issued on ${a.date}${st.verifyUrl?' · Verify at '+esc(st.verifyUrl):''}</div>` : '';
   app().innerHTML=topbar()+`<div class="app-shell">
-    <div class="demo-note no-print">🔒 <b>Privacy note:</b> This system runs entirely on this device. No student data is transmitted to any external server — all information stays local and under MiyeeUpskill's control.</div>
+    <div class="demo-note no-print">🔒 <b>Privacy note:</b> This system runs entirely on this device. No student data is transmitted to any external server. All information stays local and under MiyeeUpskill's control.</div>
     <div class="action-bar no-print"><button class="btn btn-gold" onclick="window.print()">🖨 Print / Download Certificate</button><button class="btn btn-ghost" onclick="openCourse('${c.id}')">← Course</button><button class="btn btn-ghost" onclick="go('dashboard')">Dashboard</button></div>
     <div class="cert-pages">
       <div class="cert-page"><div class="cert-inner">
@@ -1142,7 +1207,7 @@ function renderCertificate(){
       <div class="cert-page"><div class="cert-inner cert-back">
         <ol>
           <li>Mode of delivery : <span>Online</span></li>
-          <li>Date of Admission: <span>${esc(s.admitDate||'—')}</span></li>
+          <li>Date of Admission: <span>${esc(s.admitDate||'-')}</span></li>
           <li>Date of Completion: <span>${a.date}</span></li>
           <li>Name and address of all Learner Support Centres (only for Open and Distance Learning): <span>Not applicable (Online)</span></li>
           <li>Name and address of all Examination Centres: <span>Online Proctored Examination</span></li>
@@ -1155,14 +1220,15 @@ function renderCertificate(){
 </script>
 <script>
 /* ============================================================
-   ADMIN CONSOLE — dashboard, courses, students, results, settings
+   ADMIN CONSOLE, dashboard, courses, students, results, settings
    ============================================================ */
 function renderAdmin(){
-  const tabs=[["dashboard","Dashboard"],["courses","Course Designer"],["students","Students"],["results","Results & Reports"],["settings","Settings"]];
+  const tabs=[["dashboard","Dashboard"],["courses","Course Designer"],["worksheets","Worksheets"],["students","Students"],["results","Results & Reports"],["settings","Settings"]];
   const tabBtns=tabs.map(([k,l])=>`<button class="${S.adminTab===k?'active':''}" onclick="adminTab('${k}')">${l}</button>`).join('');
   let body="";
   if(S.adminTab==='dashboard') body=adminDashboard();
   else if(S.adminTab==='courses') body=adminCourses();
+  else if(S.adminTab==='worksheets') body=adminWorksheets();
   else if(S.adminTab==='students') body=adminStudents();
   else if(S.adminTab==='results') body=adminResults();
   else if(S.adminTab==='settings') body=adminSettings();
@@ -1172,6 +1238,78 @@ function renderAdmin(){
   </div>`+(S.modal?renderModal():'');
 }
 function adminTab(t){ S.adminTab=t; render(); }
+
+/* ---------- MENTOR WORKSHEET REVIEW ---------- */
+let wsFilter='all';
+function adminWorksheets(){
+  const wsLessons=allWorksheetLessons();
+  const rows=[];
+  wsLessons.forEach(({course,sem,lesson})=>{
+    DB.students.filter(s=>(s.enrolled||[]).includes(course.id)).forEach(s=>{
+      const resp=getWorksheetResponse(s.id,lesson.id);
+      if(!resp && wsFilter==='submitted') return;
+      if(resp && resp.reviewed && wsFilter==='pending') return;
+      if(!resp && wsFilter==='pending') return;
+      rows.push({student:s, course, sem, lesson, resp});
+    });
+  });
+  const filtered = wsFilter==='all' ? rows : rows.filter(r=>r.resp || wsFilter==='notsubmitted');
+  const trs=filtered.map(r=>{
+    const status = !r.resp ? '<span class="pill gray">Not submitted</span>'
+      : r.resp.reviewed ? '<span class="pill green">Reviewed</span>'
+      : '<span class="pill amber">Pending review</span>';
+    return `<tr>
+      <td><b>${esc(r.student.name)}</b><div style="font-size:11px;color:var(--muted)">${esc(r.student.id)}</div></td>
+      <td>${esc(r.course.title)}</td>
+      <td>${esc(r.lesson.title)}</td>
+      <td style="text-align:center">${status}</td>
+      <td style="text-align:right">${r.resp?`<button class="btn btn-ghost btn-sm" onclick="reviewWorksheet('${r.student.id}','${r.lesson.id}')">${r.resp.reviewed?'View / Edit Feedback':'Review'}</button>`:'<span style="font-size:12px;color:var(--muted)">Waiting on founder</span>'}</td>
+    </tr>`;
+  }).join('');
+  const total=rows.length, submitted=rows.filter(r=>r.resp).length, reviewed=rows.filter(r=>r.resp&&r.resp.reviewed).length;
+  return `<div class="stat-row">
+    <div class="stat"><div class="n">${total}</div><div class="l">Total Worksheet Assignments</div></div>
+    <div class="stat"><div class="n">${submitted}</div><div class="l">Submitted</div></div>
+    <div class="stat"><div class="n">${reviewed}</div><div class="l">Reviewed</div></div>
+    <div class="stat"><div class="n">${submitted-reviewed}</div><div class="l">Awaiting Review</div></div>
+  </div>
+  <div class="mini-toolbar">
+    <select onchange="wsFilter=this.value;render()" style="padding:9px 13px;border:1.5px solid var(--border);border-radius:8px">
+      <option value="all" ${wsFilter==='all'?'selected':''}>All founders</option>
+      <option value="submitted" ${wsFilter==='submitted'?'selected':''}>Submitted only</option>
+      <option value="pending" ${wsFilter==='pending'?'selected':''}>Pending review</option>
+    </select>
+  </div>
+  <div class="card"><table class="data"><thead><tr><th>Founder</th><th>Programme</th><th>Worksheet</th><th style="text-align:center">Status</th><th style="text-align:right">Action</th></tr></thead>
+  <tbody>${trs||`<tr><td colspan=5 class=empty>No worksheets found for this filter</td></tr>`}</tbody></table></div>`;
+}
+let reviewCtx=null;
+function reviewWorksheet(sid,lid){
+  const student=findStudent(sid);
+  const wsLessons=allWorksheetLessons();
+  const match=wsLessons.find(w=>w.lesson.id===lid);
+  const resp=getWorksheetResponse(sid,lid);
+  reviewCtx={sid,lid,student,lesson:match.lesson,course:match.course,resp};
+  S.modal='wsreview'; render();
+}
+function wsReviewModalBody(){
+  const {student,lesson,course,resp}=reviewCtx;
+  const answers=(lesson.fields||[]).map((f,fi)=>`<div style="margin-bottom:14px"><b style="color:var(--jgu-navy);font-size:13.5px">${esc(f.label)}</b><div style="background:var(--jgu-light);border-radius:8px;padding:10px 12px;margin-top:5px;font-size:14px;white-space:pre-wrap">${esc(resp.answers[fi]||'(left blank)')}</div></div>`).join('');
+  return `<div style="font-size:13px;color:var(--muted);margin-bottom:14px">${esc(student.name)} (${esc(student.id)}) · ${esc(course.title)} · Submitted ${resp.submittedAt}</div>
+  ${answers}
+  <div style="border-top:1px solid var(--border);margin:16px 0;padding-top:14px"><b style="color:var(--jgu-navy);font-size:14px">Mentor Feedback</b></div>
+  <div class="field"><textarea id="ws-note" rows="4" placeholder="Write feedback for the founder...">${esc(resp.mentorNote||'')}</textarea></div>
+  <label style="display:flex;align-items:center;gap:8px;font-size:14px"><input type="checkbox" id="ws-reviewed" ${resp.reviewed?'checked':''}> Mark as reviewed</label>`;
+}
+function saveWsReview(){
+  const note=document.getElementById('ws-note').value;
+  const reviewed=document.getElementById('ws-reviewed').checked;
+  const {sid,lid}=reviewCtx;
+  DB.worksheets[sid][lid].mentorNote=note;
+  DB.worksheets[sid][lid].reviewed=reviewed;
+  if(saveDB()){ S.modal=null; toast('Feedback saved ✓'); }
+  render();
+}
 
 /* ---------- DASHBOARD ---------- */
 function allAttempts(){
@@ -1211,7 +1349,7 @@ function adminCourses(){
       <td style="padding-left:28px">↳ ${esc(sem.name)}</td>
       <td style="text-align:center">${semLessonCount(sem)} lessons</td>
       <td style="text-align:center">${sem.assessment.questions.length} MCQs</td>
-      <td style="text-align:center">—</td>
+      <td style="text-align:center">-</td>
       <td style="text-align:right;white-space:nowrap">
         <button class="btn btn-ghost btn-sm" onclick="editSemester('${c.id}','${sem.id}')">Content</button>
         <button class="btn btn-ghost btn-sm" onclick="editAssessment('${c.id}','${sem.id}')">Assessment</button>
@@ -1253,7 +1391,7 @@ function deleteSemester(cid,semId){
   saveDB(); toast('Semester deleted'); render();
 }
 
-/* Course INFO editor (title/school/etc only — semesters edited separately) */
+/* Course INFO editor (title/school/etc only, semesters edited separately) */
 let edCourse=null;
 function editCourse(id){
   if(id){ edCourse=JSON.parse(JSON.stringify(findCourse(id))); }
@@ -1331,22 +1469,51 @@ let edLesson=null, edLessonPos=null;
 function editLessonData(mi,li){
   edLessonPos={mi,li};
   edLesson = li!=null ? JSON.parse(JSON.stringify(edSem.modules[mi].lessons[li]))
-    : {id:uid('l'),title:"",type:"video",mins:15,video:"",body:""};
+    : {id:uid('l'),title:"",type:"video",mins:15,video:"",body:"",fields:[]};
+  if(!Array.isArray(edLesson.fields)) edLesson.fields=[];
   S.modal='lesson'; render();
 }
 function lessonModalBody(){
   const l=edLesson;
+  const isWs=l.type==='worksheet';
+  const typeSelect=`<select id="el-type" onchange="switchLessonType(this.value)">
+    <option value="video" ${l.type==='video'?'selected':''}>Video</option>
+    <option value="reading" ${l.type==='reading'?'selected':''}>Reading</option>
+    <option value="worksheet" ${isWs?'selected':''}>Worksheet (founder fills in)</option>
+  </select>`;
+  const videoBlock = isWs ? '' : `<div class="field"><label>Video URL <span style="color:var(--muted);font-weight:400">(YouTube, Vimeo, or direct .mp4; blank for reading)</span></label><input id="el-video" value="${esc(l.video)}" placeholder="https://youtu.be/..."></div>`;
+  const wsBlock = isWs ? `
+    <div style="border-top:1px solid var(--border);margin:14px 0;padding-top:12px"><b style="color:var(--jgu-navy);font-size:14px">Worksheet Fields</b>
+    <button class="btn btn-ghost btn-sm" style="float:right" onclick="addWsField()">+ Add Field</button></div>
+    ${(l.fields||[]).map((f,fi)=>`<div class="q-editor">
+      <div class="qh"><b>Field ${fi+1}</b><button class="btn btn-danger btn-sm" onclick="delWsField(${fi})">Delete</button></div>
+      <div class="field"><label>Label</label><input type="text" value="${esc(f.label)}" onchange="edWsField(${fi},'label',this.value)" placeholder="e.g. What problem are you solving?"></div>
+      <div class="field row2"><div><label>Hint (optional)</label><input type="text" value="${esc(f.hint||'')}" onchange="edWsField(${fi},'hint',this.value)" placeholder="Short guidance"></div><div><label>Rows</label><input type="number" value="${f.rows||3}" onchange="edWsField(${fi},'rows',this.value)"></div></div>
+    </div>`).join('') || '<div class="empty" style="padding:16px">No fields yet. Add the questions founders will answer.</div>'}
+  ` : '';
   return `<div class="field"><label>Lesson Title</label><input id="el-title" value="${esc(l.title)}"></div>
-  <div class="field row2"><div><label>Type</label><select id="el-type"><option value="video" ${l.type==='video'?'selected':''}>Video</option><option value="reading" ${l.type==='reading'?'selected':''}>Reading</option></select></div><div><label>Duration (min)</label><input id="el-mins" type="number" value="${l.mins}"></div></div>
-  <div class="field"><label>Video URL <span style="color:var(--muted);font-weight:400">(YouTube, Vimeo, or direct .mp4 — blank for reading)</span></label><input id="el-video" value="${esc(l.video)}" placeholder="https://youtu.be/..."></div>
-  <div class="field"><label>Lesson Content / Notes</label><textarea id="el-body" rows="5">${esc(l.body)}</textarea></div>
-  <div style="font-size:12px;color:var(--muted);background:var(--jgu-light);padding:10px;border-radius:8px">💡 Paste a YouTube/Vimeo link and it plays inline for students.</div>`;
+  <div class="field row2"><div><label>Type</label>${typeSelect}</div><div><label>Duration (min)</label><input id="el-mins" type="number" value="${l.mins}"></div></div>
+  ${videoBlock}
+  <div class="field"><label>${isWs?'Instructions for founders':'Lesson Content / Notes'}</label><textarea id="el-body" rows="4">${esc(l.body)}</textarea></div>
+  ${wsBlock}
+  ${!isWs?'<div style="font-size:12px;color:var(--muted);background:var(--jgu-light);padding:10px;border-radius:8px">💡 Paste a YouTube/Vimeo link and it plays inline for students.</div>':''}`;
 }
+function switchLessonType(v){ commitLessonTypeSwap(v); render(); }
+function commitLessonTypeSwap(v){
+  const g=id=>{const e=document.getElementById(id);return e?e.value:undefined;};
+  if(document.getElementById('el-title')){ edLesson.title=g('el-title'); edLesson.mins=parseInt(g('el-mins'))||0; edLesson.body=g('el-body'); }
+  edLesson.type=v;
+}
+function addWsField(){ commitLessonTypeSwap(edLesson.type); edLesson.fields=edLesson.fields||[]; edLesson.fields.push({label:"",hint:"",rows:3}); render(); }
+function delWsField(fi){ commitLessonTypeSwap(edLesson.type); edLesson.fields.splice(fi,1); render(); }
+function edWsField(fi,key,v){ edLesson.fields[fi][key]= key==='rows'?(parseInt(v)||3):v; }
 function saveLessonModal(){
   const g=id=>document.getElementById(id).value;
   edLesson.title=g('el-title'); edLesson.type=g('el-type'); edLesson.mins=parseInt(g('el-mins'))||0;
-  edLesson.video=g('el-video'); edLesson.body=g('el-body');
+  edLesson.body=g('el-body');
+  if(edLesson.type!=='worksheet'){ edLesson.video=document.getElementById('el-video')?document.getElementById('el-video').value:''; }
   if(!edLesson.title.trim()){ toast('Lesson title required','err'); return; }
+  if(edLesson.type==='worksheet' && (!edLesson.fields||!edLesson.fields.length)){ toast('Add at least one worksheet field','err'); return; }
   const {mi,li}=edLessonPos;
   if(li!=null) edSem.modules[mi].lessons[li]=edLesson;
   else edSem.modules[mi].lessons.push(edLesson);
@@ -1508,7 +1675,7 @@ function deleteStudent(id){
 let edStudent=null;
 function editStudent(id){
   if(id) edStudent=JSON.parse(JSON.stringify(findStudent(id)));
-  else edStudent={id:nextStudentId(),name:"",email:"",pass:"demo1234",phone:"",govId:"",photo:"",admitDate:today(),enrolled:[]};
+  else edStudent={id:nextStudentId(),name:"",email:"",pass:"",phone:"",govId:"",photo:"",admitDate:today(),enrolled:[]};
   S.modal='student'; render();
 }
 function studentModalBody(){
@@ -1550,7 +1717,7 @@ function adminResults(){
   const atts=allAttempts();
   const rows=atts.map(x=>{
     const s=findStudent(x.sid), c=findCourse(x.cid), a=x.a;
-    return `<tr><td><b>${esc(s?.id||x.sid)}</b></td><td>${esc(s?.name||'—')}</td><td>${esc(c?.title||x.cid)}</td><td>${esc(a.semName||'—')}</td>
+    return `<tr><td><b>${esc(s?.id||x.sid)}</b></td><td>${esc(s?.name||'-')}</td><td>${esc(c?.title||x.cid)}</td><td>${esc(a.semName||'-')}</td>
       <td style="text-align:center">${a.correct}/${a.total}</td><td style="text-align:center">${a.pct}%</td>
       <td style="text-align:center"><span class="grade-pill" style="background:${a.gradeColor}">${a.grade}</span></td>
       <td style="text-align:center"><span class="pill ${a.passed?'green':'red'}">${a.passed?'Pass':'Fail'}</span></td>
@@ -1760,7 +1927,7 @@ function restoreData(inp){
       const parsed=JSON.parse(e.target.result);
       const mig=migrateDB(parsed);
       if(!mig || !Array.isArray(mig.courses) || !Array.isArray(mig.students) || !Array.isArray(mig.admins)){
-        msg.innerHTML='<span style="color:var(--warn)">Invalid backup file — missing core data.</span>'; return;
+        msg.innerHTML='<span style="color:var(--warn)">Invalid backup file, missing core data.</span>'; return;
       }
       if(!confirm('Restore this backup? It will REPLACE all current data ('+DB.courses.length+' courses, '+DB.students.length+' students).')) { msg.innerHTML=''; return; }
       DB=mig;
@@ -1777,11 +1944,12 @@ function resetData(){ if(!confirm('Reset ALL data back to demo defaults? This er
 function renderModal(){
   let title="",body="",save="",wide="";
   if(S.modal==='course'){ title=edCourse.title?'Edit Course Info':'New Course'; body=courseModalBody(); save='saveCourseModal()'; wide='wide'; }
-  else if(S.modal==='semester'){ title='Semester Content — '+esc(edSem.name); body=semesterModalBody(); save='saveSemesterModal()'; wide='wide'; }
+  else if(S.modal==='semester'){ title='Semester Content: '+esc(edSem.name); body=semesterModalBody(); save='saveSemesterModal()'; wide='wide'; }
   else if(S.modal==='lesson'){ title='Lesson'; body=lessonModalBody(); save='saveLessonModal()'; }
   else if(S.modal==='assess'){ title='Assessment Builder'; body=assessModalBody(); save='saveAssessModal()'; wide='wide'; }
   else if(S.modal==='student'){ title=edStudent.name?'Edit Student':'Add Student'; body=studentModalBody(); save='saveStudentModal()'; }
   else if(S.modal==='admin'){ title=edAdminIdx!=null?'Edit Admin':'Add Admin'; body=adminModalBody(); save='saveAdminModal()'; }
+  else if(S.modal==='wsreview'){ title='Worksheet Review'; body=wsReviewModalBody(); save='saveWsReview()'; wide='wide'; }
   const closeTo = S.modal==='lesson' ? "S.modal='semester';render()" : "S.modal=null;render()";
   return `<div class="modal-bg" onclick="if(event.target===this){${closeTo}}"><div class="modal ${wide}">
     <div class="modal-h"><h3>${title}</h3><button class="x" onclick="${closeTo}">×</button></div>
