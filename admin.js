@@ -31,7 +31,11 @@ async function route(){
       else await renderDesignerList(view);
     }
     else if(tab==='worksheets') await renderWorksheetsTab(view);
-    else if(tab==='students') await renderStudentsTab(view);
+    else if(tab==='students'){
+      if(parts[1] && parts[2]==='marksheet' && parts[3]) await renderFounderMarksheet(view, parts[1], parts[3]);
+      else if(parts[1] && parts[2]==='certificate' && parts[3]) await renderFounderCertificate(view, parts[1], parts[3]);
+      else await renderStudentsTab(view);
+    }
     else if(tab==='settings') await renderSettingsTab(view);
     else view.innerHTML = '<div class="err">Unknown page.</div>';
   }catch(err){
@@ -779,7 +783,8 @@ async function renderStudentsTab(view){
     const courseNames = myEnrol.map(e=> (courses.find(c=>c.id===e.course_id)||{}).title).filter(Boolean);
     return '<tr><td>'+esc(f.full_name)+'</td>'+
       '<td>'+(courseNames.length ? courseNames.map(esc).join(', ') : '<span style="color:var(--muted)">Not enrolled</span>')+'</td>'+
-      '<td><button class="btn btn-ghost btn-sm" onclick="openManageEnrolModal(\''+f.id+'\')">Manage Enrolments</button></td></tr>';
+      '<td><button class="btn btn-ghost btn-sm" onclick="openManageEnrolModal(\''+f.id+'\')">Manage Enrolments</button> '+
+      '<button class="btn btn-ghost btn-sm" onclick="openFounderRecordsModal(\''+f.id+'\')">View Records</button></td></tr>';
   }).join('');
 
   view.innerHTML = '<div class="crumb">Home / Admin Console / Students</div>'+
@@ -896,6 +901,99 @@ async function saveEnrolments(founderId){
     if(error){ toast('Could not remove enrolment: '+error.message, 'err'); return; }
   }
   closeModal(); toast('Enrolments updated.'); route();
+}
+
+// ---------- founder marksheet / certificate records (admin/mentor view) ----------
+
+function openFounderRecordsModal(founderId){
+  const founder = STUD_CACHE.founders.find(f=>f.id===founderId);
+  if(!founder) return;
+  loadFounderRecordsList(founder);
+}
+
+async function loadFounderRecordsList(founder){
+  openModal('<h3>Records &middot; '+esc(founder.full_name)+'</h3><div id="records-body" class="loading" style="min-height:80px"><div class="spinner"></div>Loading...</div>', { wide:true });
+
+  const enrolments = STUD_CACHE.enrolments.filter(e=>e.founder_id===founder.id);
+  const items = [];
+  for(const en of enrolments){
+    const course = STUD_CACHE.courses.find(c=>c.id===en.course_id);
+    if(!course) continue;
+    const semesters = await fetchCourseTree(course.id);
+    const { data: attempts } = await sb.from('assessment_attempts').select('*').eq('course_id', course.id).eq('founder_id', founder.id);
+    const passedBySem = {};
+    (attempts||[]).forEach(a=>{ if(a.passed) passedBySem[a.semester_id] = a; });
+
+    const semRows = semesters.map(s=>{
+      const hasAttempt = (attempts||[]).some(a=>a.semester_id===s.id);
+      return hasAttempt
+        ? '<div class="record-row">'+esc(s.name)+' <a onclick="closeModal();location.hash=\'#/students/'+founder.id+'/marksheet/'+s.id+'\'">View Marksheet</a></div>'
+        : '<div class="record-row" style="color:var(--muted)">'+esc(s.name)+' <span>Not attempted</span></div>';
+    }).join('');
+
+    const allPassed = semesters.length>0 && semesters.every(s=>passedBySem[s.id]);
+    const certRow = allPassed
+      ? '<div class="record-row"><b>Certificate</b> <a onclick="closeModal();location.hash=\'#/students/'+founder.id+'/certificate/'+course.id+'\'">View Certificate</a></div>'
+      : '<div class="record-row" style="color:var(--muted)"><b>Certificate</b> <span>Locked until all semesters passed</span></div>';
+
+    items.push('<div class="card" style="margin-bottom:12px"><div class="card-b"><b style="color:var(--navy)">'+esc(course.title)+'</b>'+semRows+certRow+'</div></div>');
+  }
+
+  const box = document.getElementById('records-body');
+  if(box) box.outerHTML = '<div id="records-body">'+(items.join('') || '<p style="color:var(--muted)">Not enrolled in any courses.</p>')+'</div>';
+}
+
+async function renderFounderMarksheet(view, founderId, semesterId){
+  let founder = STUD_CACHE.founders.find(f=>f.id===founderId);
+  if(!founder){ const r = await sb.from('profiles').select('full_name').eq('id', founderId).single(); founder = r.data; }
+  const { data: semester } = await sb.from('semesters').select('name,pass_mark,course_id').eq('id', semesterId).single();
+  if(!semester) throw new Error('Semester not found');
+  const { data: course } = await sb.from('courses').select('title').eq('id', semester.course_id).single();
+  const { data: attempts } = await sb.from('assessment_attempts').select('*').eq('semester_id', semesterId).eq('founder_id', founderId);
+
+  const sorted = (attempts||[]).slice().sort((a,b)=> new Date(b.submitted_at) - new Date(a.submitted_at));
+  const best = sorted.find(a=>a.passed) || sorted[0];
+  if(!best){
+    view.innerHTML = '<div class="crumb no-print">Home / Admin Console / Students / Marksheet</div><div class="err">No attempt recorded for this semester.</div>';
+    return;
+  }
+
+  view.innerHTML = '<div class="crumb no-print">Home / Admin Console / Students / Marksheet</div>'+
+    '<div class="no-print" style="margin-bottom:14px"><button class="btn btn-gold btn-sm" onclick="window.print()">Print Marksheet</button></div>'+
+    marksheetHTML({
+      founderName: founder ? founder.full_name : 'Founder', courseTitle: course.title, semesterName: semester.name,
+      score: best.score, maxScore: best.max_score, percentage: best.percentage, passed: best.passed,
+      passMark: semester.pass_mark, attemptNumber: best.attempt_number, dateStr: new Date(best.submitted_at).toLocaleDateString()
+    });
+}
+
+async function renderFounderCertificate(view, founderId, courseId){
+  let founder = STUD_CACHE.founders.find(f=>f.id===founderId);
+  if(!founder){ const r = await sb.from('profiles').select('full_name').eq('id', founderId).single(); founder = r.data; }
+  const { data: course } = await sb.from('courses').select('title').eq('id', courseId).single();
+  if(!course) throw new Error('Course not found');
+  const semesters = await fetchCourseTree(courseId);
+  const { data: attempts } = await sb.from('assessment_attempts').select('*').eq('course_id', courseId).eq('founder_id', founderId);
+
+  const passedBySemester = {};
+  (attempts||[]).forEach(a=>{
+    if(a.passed && (!passedBySemester[a.semester_id] || new Date(a.submitted_at) > new Date(passedBySemester[a.semester_id].submitted_at))){
+      passedBySemester[a.semester_id] = a;
+    }
+  });
+  const allPassed = semesters.length>0 && semesters.every(s=>passedBySemester[s.id]);
+  if(!allPassed){
+    view.innerHTML = '<div class="crumb no-print">Home / Admin Console / Students / Certificate</div><div class="err">This founder has not passed every semester yet.</div>';
+    return;
+  }
+
+  const completionDate = new Date(Math.max(...semesters.map(s=> new Date(passedBySemester[s.id].submitted_at).getTime())));
+  view.innerHTML = '<div class="crumb no-print">Home / Admin Console / Students / Certificate</div>'+
+    '<div class="no-print" style="margin-bottom:14px"><button class="btn btn-gold btn-sm" onclick="window.print()">Print Certificate</button></div>'+
+    certificateHTML({
+      founderName: founder ? founder.full_name : 'Founder', courseTitle: course.title,
+      semesterNames: semesters.map(s=>s.name), dateStr: completionDate.toLocaleDateString()
+    });
 }
 
 // ---------- Settings tab ----------

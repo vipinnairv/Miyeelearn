@@ -45,6 +45,8 @@ function parseHash(){
     if(parts[2]==='lesson' && parts[3]) return { view:'lesson', courseId:parts[1], lessonId:parts[3] };
     if(parts[2]==='semester' && parts[3] && parts[4]==='quiz') return { view:'quiz', courseId:parts[1], semesterId:parts[3] };
     if(parts[2]==='semester' && parts[3] && parts[4]==='attempt' && parts[5]) return { view:'attempt', courseId:parts[1], semesterId:parts[3], attemptId:parts[5] };
+    if(parts[2]==='semester' && parts[3] && parts[4]==='marksheet') return { view:'marksheet', courseId:parts[1], semesterId:parts[3] };
+    if(parts[2]==='certificate') return { view:'certificate', courseId:parts[1] };
     return { view:'course', courseId:parts[1] };
   }
   return { view:'list' };
@@ -61,6 +63,8 @@ async function route(){
     else if(r.view==='lesson') await renderLesson(view, r.courseId, r.lessonId);
     else if(r.view==='quiz') await renderQuiz(view, r.courseId, r.semesterId);
     else if(r.view==='attempt') await renderAttemptReview(view, r.courseId, r.semesterId, r.attemptId);
+    else if(r.view==='marksheet') await renderMarksheet(view, r.courseId, r.semesterId);
+    else if(r.view==='certificate') await renderCertificate(view, r.courseId);
   }catch(err){
     console.error(err);
     view.innerHTML = '<div class="err">Could not load this page. '+esc(err.message||'Unknown error')+'</div>';
@@ -179,11 +183,13 @@ async function renderCourseDetail(view, courseId){
     let assessActions;
     if(passedAttempt){
       assessActions = '<span class="pill pill-ok">Passed '+Math.round(passedAttempt.percentage)+'%</span>'+
-        '<button class="btn btn-ghost btn-sm" onclick="location.hash=\'#/course/'+courseId+'/semester/'+s.id+'/attempt/'+passedAttempt.id+'\'">View Result</button>';
+        '<button class="btn btn-ghost btn-sm" onclick="location.hash=\'#/course/'+courseId+'/semester/'+s.id+'/attempt/'+passedAttempt.id+'\'">View Result</button>'+
+        '<button class="btn btn-ghost btn-sm" onclick="location.hash=\'#/course/'+courseId+'/semester/'+s.id+'/marksheet\'">View Marksheet</button>';
     }else if(semAttempts.length){
       const latest = semAttempts[0];
       assessActions = '<span class="pill pill-warn">Failed '+Math.round(latest.percentage)+'%</span>'+
         '<button class="btn btn-ghost btn-sm" onclick="location.hash=\'#/course/'+courseId+'/semester/'+s.id+'/attempt/'+latest.id+'\'">View Result</button>'+
+        '<button class="btn btn-ghost btn-sm" onclick="location.hash=\'#/course/'+courseId+'/semester/'+s.id+'/marksheet\'">View Marksheet</button>'+
         '<button class="btn btn-gold btn-sm" onclick="location.hash=\'#/course/'+courseId+'/semester/'+s.id+'/quiz\'">Retake Assessment</button>';
     }else{
       assessActions = '<button class="btn btn-gold btn-sm" onclick="location.hash=\'#/course/'+courseId+'/semester/'+s.id+'/quiz\'">Take Assessment</button>';
@@ -198,9 +204,19 @@ async function renderCourseDetail(view, courseId){
     '</div>';
   }).join('');
 
+  const allPassed = semesters.length>0 && semesters.every(s=> (attemptsBySemester[s.id]||[]).some(a=>a.passed));
+  const passedCount = semesters.filter(s=> (attemptsBySemester[s.id]||[]).some(a=>a.passed)).length;
+  const certHtml = allPassed
+    ? '<div class="card" style="margin-bottom:20px;border-top:3px solid var(--accent)"><div class="card-b" style="display:flex;justify-content:space-between;align-items:center;gap:12px">'+
+        '<div><b style="color:var(--navy)">Course completed</b><div style="font-size:12.5px;color:var(--muted)">All semesters passed. Your certificate is ready.</div></div>'+
+        '<button class="btn btn-gold btn-sm" onclick="location.hash=\'#/course/'+courseId+'/certificate\'">View Certificate</button>'+
+      '</div></div>'
+    : (semesters.length ? '<p style="color:var(--muted);font-size:12.5px;margin-bottom:18px">Certificate unlocks once all semesters are passed ('+passedCount+' of '+semesters.length+' passed so far).</p>' : '');
+
   view.innerHTML = '<div class="crumb"><a onclick="location.hash=\'#/\'">My Courses</a> / '+esc(course.title)+'</div>'+
     '<div class="page-head"><h1>'+esc(course.title)+'</h1></div>'+
     '<p style="color:var(--muted);font-size:14px;margin-bottom:20px;max-width:760px">'+esc(course.description||'')+'</p>'+
+    certHtml+
     semHtml;
 }
 
@@ -530,4 +546,61 @@ async function renderAttemptReview(view, courseId, semesterId, attemptId){
       (!revealed ? '<p style="font-size:12px;color:var(--muted);margin-top:10px">Correct answers are shown once you pass this assessment.</p>' : '')+
     '</div></div>'+
     qHtml;
+}
+
+// ---------- printable marksheet / certificate ----------
+// marksheetHTML() / certificateHTML() live in common.js (shared with admin.js).
+
+async function renderMarksheet(view, courseId, semesterId){
+  const uid = CTX.session.user.id;
+  const { data: course } = await sb.from('courses').select('title').eq('id', courseId).single();
+  const { data: semester } = await sb.from('semesters').select('name,pass_mark').eq('id', semesterId).single();
+  const { data: attempts } = await sb.from('assessment_attempts').select('*').eq('semester_id', semesterId).eq('founder_id', uid);
+  if(!course || !semester) throw new Error('Not found');
+
+  const sorted = (attempts||[]).slice().sort((a,b)=> new Date(b.submitted_at) - new Date(a.submitted_at));
+  const best = sorted.find(a=>a.passed) || sorted[0];
+  if(!best){
+    view.innerHTML = '<div class="crumb no-print"><a onclick="location.hash=\'#/course/'+courseId+'\'">Back to Course</a> / Marksheet</div>'+
+      '<div class="err">No assessment attempt yet for this semester. Take the assessment first.</div>';
+    return;
+  }
+
+  view.innerHTML = '<div class="crumb no-print"><a onclick="location.hash=\'#/course/'+courseId+'\'">Back to Course</a> / Marksheet</div>'+
+    '<div class="no-print" style="margin-bottom:14px"><button class="btn btn-gold btn-sm" onclick="window.print()">Print Marksheet</button></div>'+
+    marksheetHTML({
+      founderName: CTX.profile.full_name, courseTitle: course.title, semesterName: semester.name,
+      score: best.score, maxScore: best.max_score, percentage: best.percentage, passed: best.passed,
+      passMark: semester.pass_mark, attemptNumber: best.attempt_number, dateStr: new Date(best.submitted_at).toLocaleDateString()
+    });
+}
+
+async function renderCertificate(view, courseId){
+  const uid = CTX.session.user.id;
+  const { data: course } = await sb.from('courses').select('title').eq('id', courseId).single();
+  if(!course) throw new Error('Course not found');
+  const semesters = await fetchCourseTree(courseId);
+  const { data: attempts } = await sb.from('assessment_attempts').select('*').eq('course_id', courseId).eq('founder_id', uid);
+
+  const passedBySemester = {};
+  (attempts||[]).forEach(a=>{
+    if(a.passed && (!passedBySemester[a.semester_id] || new Date(a.submitted_at) > new Date(passedBySemester[a.semester_id].submitted_at))){
+      passedBySemester[a.semester_id] = a;
+    }
+  });
+  const allPassed = semesters.length>0 && semesters.every(s=>passedBySemester[s.id]);
+
+  if(!allPassed){
+    view.innerHTML = '<div class="crumb no-print"><a onclick="location.hash=\'#/course/'+courseId+'\'">Back to Course</a> / Certificate</div>'+
+      '<div class="err">Certificate unlocks once you have passed every semester in this course.</div>';
+    return;
+  }
+
+  const completionDate = new Date(Math.max(...semesters.map(s=> new Date(passedBySemester[s.id].submitted_at).getTime())));
+  view.innerHTML = '<div class="crumb no-print"><a onclick="location.hash=\'#/course/'+courseId+'\'">Back to Course</a> / Certificate</div>'+
+    '<div class="no-print" style="margin-bottom:14px"><button class="btn btn-gold btn-sm" onclick="window.print()">Print Certificate</button></div>'+
+    certificateHTML({
+      founderName: CTX.profile.full_name, courseTitle: course.title,
+      semesterNames: semesters.map(s=>s.name), dateStr: completionDate.toLocaleDateString()
+    });
 }
