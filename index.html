@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiyeeUpskill — Learn, Assess, Certify</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%0A%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%230b2a5b%22/%3E%0A%3Crect%20x%3D%2214%22%20y%3D%2238%22%20width%3D%228%22%20height%3D%2214%22%20rx%3D%222%22%20fill%3D%22%23c8a24a%22/%3E%0A%3Crect%20x%3D%2228%22%20y%3D%2230%22%20width%3D%228%22%20height%3D%2222%22%20rx%3D%222%22%20fill%3D%22%23e0c070%22/%3E%0A%3Crect%20x%3D%2242%22%20y%3D%2220%22%20width%3D%228%22%20height%3D%2232%22%20rx%3D%222%22%20fill%3D%22%23c8a24a%22/%3E%0A%3Cpath%20d%3D%22M38%2020%20l8%20-10%20l8%2010%20z%22%20fill%3D%22%23e0c070%22/%3E%0A%3C/svg%3E">
+<style>
+:root{
+  --jgu-navy:#0b2a5b;--jgu-blue:#123a7a;--jgu-accent:#c8a24a;--jgu-gold:#c8a24a;
+  --jgu-sky:#82c8de;--jgu-light:#f4f7fb;--jgu-red:#8b1e2d;--text:#1c2733;
+  --muted:#6a7788;--border:#dbe2ec;--ok:#1f8a4c;--warn:#c0392b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--jgu-light);color:var(--text);line-height:1.5}
+img{max-width:100%}
+button{font-family:inherit;cursor:pointer;border:none;font-size:14px}
+input,select,textarea{font-family:inherit}
+.hidden{display:none!important}
+a{color:var(--jgu-blue);cursor:pointer}
+
+.topbar{background:#fff;border-bottom:3px solid var(--jgu-accent);box-shadow:0 2px 8px rgba(0,0,0,.06);position:sticky;top:0;z-index:50}
+.topbar-inner{max-width:1240px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;gap:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{height:46px}
+.brand-txt{font-size:12px;color:var(--muted);border-left:2px solid var(--border);padding-left:12px;line-height:1.3}
+.brand-txt b{color:var(--jgu-navy);font-size:14px;display:block}
+.nav-user{display:flex;align-items:center;gap:14px;font-size:14px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--jgu-navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600}
+.btn{background:var(--jgu-navy);color:#fff;padding:9px 18px;border-radius:6px;font-weight:600;transition:.15s}
+.btn:hover{background:var(--jgu-blue)}
+.btn-gold{background:var(--jgu-accent);color:#1c2733}
+.btn-gold:hover{filter:brightness(1.05)}
+.btn-ghost{background:transparent;color:var(--jgu-navy);border:1.5px solid var(--jgu-navy)}
+.btn-ghost:hover{background:var(--jgu-navy);color:#fff}
+.btn-danger{background:#fff;color:var(--warn);border:1.5px solid var(--warn)}
+.btn-danger:hover{background:var(--warn);color:#fff}
+.btn-sm{padding:6px 12px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--jgu-navy),var(--jgu-blue) 60%,#1a4a94);padding:20px}
+.login-card{background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.3);width:100%;max-width:940px;display:flex;overflow:hidden;min-height:540px}
+.login-left{flex:1.1;background:linear-gradient(160deg,var(--jgu-navy),#1a4a94);color:#fff;padding:44px 40px;display:flex;flex-direction:column;justify-content:center}
+.login-left .lg-logo{background:#fff;padding:14px 16px;border-radius:10px;display:inline-block;margin-bottom:26px;align-self:flex-start}
+.login-left .lg-logo img{height:52px;display:block}
+.login-left h1{font-size:25px;line-height:1.3;margin-bottom:14px}
+.login-left p{opacity:.9;font-size:14px;margin-bottom:22px}
+.login-left ul{list-style:none;font-size:14px;opacity:.95}
+.login-left ul li{padding:6px 0 6px 26px;position:relative}
+.login-left ul li:before{content:"\2713";position:absolute;left:0;color:var(--jgu-accent);font-weight:700}
+.login-right{flex:1;padding:40px;display:flex;flex-direction:column;justify-content:center}
+.login-right h2{color:var(--jgu-navy);font-size:22px;margin-bottom:6px}
+.login-right .sub{color:var(--muted);font-size:13.5px;margin-bottom:22px}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--jgu-navy);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:14px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--jgu-blue)}
+.field.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.role-tabs{display:flex;gap:8px;margin-bottom:20px}
+.role-tabs button{flex:1;padding:9px;border:1.5px solid var(--border);background:#fff;border-radius:8px;font-weight:600;color:var(--muted)}
+.role-tabs button.active{border-color:var(--jgu-navy);background:var(--jgu-navy);color:#fff}
+.hint{font-size:12px;color:var(--muted);margin-top:14px;text-align:center;background:var(--jgu-light);padding:10px;border-radius:8px}
+.err{color:var(--warn);font-size:13px;margin-top:10px;font-weight:600}
+
+.app-shell{max-width:1240px;margin:0 auto;padding:24px 20px 60px}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.page-head h1{color:var(--jgu-navy);font-size:23px}
+.crumb{font-size:13px;color:var(--muted);margin-bottom:4px}
+.crumb a:hover{text-decoration:underline}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px}
+.stat{background:#fff;border-radius:12px;padding:18px 20px;border:1px solid var(--border);border-top:3px solid var(--jgu-accent)}
+.stat .n{font-size:26px;font-weight:700;color:var(--jgu-navy)}
+.stat .l{font-size:13px;color:var(--muted);margin-top:2px}
+
+.card{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden}
+.card-h{padding:16px 20px;border-bottom:1px solid var(--border);font-weight:700;color:var(--jgu-navy);display:flex;justify-content:space-between;align-items:center}
+.card-b{padding:20px}
+
+.course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.course-card{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;transition:.18s;display:flex;flex-direction:column}
+.course-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(11,42,91,.12)}
+.course-banner{height:120px;background:linear-gradient(135deg,var(--jgu-navy),#1a4a94);color:#fff;padding:18px;display:flex;flex-direction:column;justify-content:space-between}
+.course-banner .tag{align-self:flex-start;background:rgba(255,255,255,.18);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.course-banner h3{font-size:16px;line-height:1.3}
+.course-body{padding:16px 18px;flex:1;display:flex;flex-direction:column}
+.course-meta{font-size:12.5px;color:var(--muted);margin-bottom:12px;display:flex;gap:14px;flex-wrap:wrap}
+.progress-bar{height:8px;background:var(--jgu-light);border-radius:20px;overflow:hidden;margin-bottom:6px}
+.progress-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--jgu-accent),#e0c070);border-radius:20px}
+.progress-lbl{font-size:12px;color:var(--muted);margin-bottom:14px;display:flex;justify-content:space-between}
+.course-body .btn{margin-top:auto;text-align:center}
+
+.two-col{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start}
+.module{border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.module-h{background:var(--jgu-light);padding:14px 18px;font-weight:700;color:var(--jgu-navy);display:flex;justify-content:space-between;align-items:center}
+.module-h .mstat{font-size:12px;font-weight:600;color:var(--muted)}
+.lesson{padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer}
+.lesson:hover{background:#fafbfd}
+.lesson .ic{width:30px;height:30px;border-radius:50%;background:var(--jgu-light);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.lesson.done .ic{background:var(--ok);color:#fff}
+.lesson .lt{flex:1}.lesson .lt b{font-size:14px;display:block}.lesson .lt span{font-size:12px;color:var(--muted)}
+.lesson .lk{font-size:12px;color:var(--jgu-blue);font-weight:600}
+
+.side-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;position:sticky;top:90px}
+.side-card h4{color:var(--jgu-navy);font-size:15px;margin-bottom:14px}
+.side-stat{display:flex;justify-content:space-between;font-size:13.5px;padding:7px 0;border-bottom:1px dashed var(--border)}
+.side-stat:last-of-type{border:none}
+
+.viewer{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.video-ph{background:#0b1220;aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:14px}
+.play-btn{width:70px;height:70px;border-radius:50%;background:var(--jgu-accent);display:flex;align-items:center;justify-content:center;font-size:26px;color:#1c2733;cursor:pointer}
+.video-ph video,.video-ph iframe{width:100%;height:100%;border:none}
+.vwrap{position:relative;width:100%;aspect-ratio:16/9;background:#000}
+.vwrap video,.vwrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.lesson-body{padding:26px 30px}
+.lesson-body h2{color:var(--jgu-navy);margin-bottom:14px}
+.lesson-body p{margin-bottom:14px;color:#334}
+.lesson-nav{display:flex;justify-content:space-between;padding:20px 30px;border-top:1px solid var(--border)}
+
+.quiz-head{background:linear-gradient(135deg,var(--jgu-navy),#1a4a94);color:#fff;border-radius:12px;padding:24px 28px;margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.quiz-head h1{font-size:22px;margin-bottom:4px}.quiz-head .qmeta{font-size:13px;opacity:.9}
+.timer{background:rgba(255,255,255,.15);padding:10px 20px;border-radius:10px;text-align:center}
+.timer .t{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}.timer .l{font-size:11px;opacity:.85}
+.timer.warn{background:var(--jgu-red)}
+.q-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:18px}
+.q-num{font-size:12px;font-weight:700;color:var(--jgu-accent);letter-spacing:.5px}
+.q-text{font-size:16px;font-weight:600;margin:6px 0 18px}
+.opt{display:flex;align-items:center;gap:12px;padding:13px 16px;border:1.5px solid var(--border);border-radius:9px;margin-bottom:10px;cursor:pointer;transition:.12s}
+.opt:hover{border-color:var(--jgu-blue);background:#fafbff}
+.opt.sel{border-color:var(--jgu-navy);background:#eef3fb}
+.opt .radio{width:20px;height:20px;border:2px solid var(--muted);border-radius:50%;flex-shrink:0;position:relative}
+.opt.sel .radio{border-color:var(--jgu-navy)}
+.opt.sel .radio:after{content:"";position:absolute;inset:3px;background:var(--jgu-navy);border-radius:50%}
+.opt .ol{font-weight:700;color:var(--muted);width:20px}
+.quiz-foot{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px 24px;position:sticky;bottom:16px;box-shadow:0 -4px 14px rgba(0,0,0,.05)}
+.q-palette{display:flex;gap:8px;flex-wrap:wrap}
+.q-palette button{width:34px;height:34px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-weight:600;font-size:13px}
+.q-palette button.answered{background:var(--ok);color:#fff;border-color:var(--ok)}
+.q-palette button.current{border-color:var(--jgu-navy);border-width:2px}
+
+.result-hero{text-align:center;padding:30px;background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:24px}
+.result-hero .badge{width:90px;height:90px;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:42px}
+.badge.pass{background:#e8f6ee;color:var(--ok)}.badge.fail{background:#fdecea;color:var(--warn)}
+.result-hero h1{color:var(--jgu-navy);font-size:26px}
+.score-big{font-size:46px;font-weight:800;color:var(--jgu-navy);margin:6px 0}
+.result-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+.result-stats .rs{background:var(--jgu-light);border-radius:10px;padding:14px}
+.result-stats .rs .n{font-size:22px;font-weight:700;color:var(--jgu-navy)}.result-stats .rs .l{font-size:12px;color:var(--muted)}
+
+.sheet{background:#fff;border:1px solid var(--border);max-width:820px;margin:0 auto}
+.sheet-head{border-bottom:3px double var(--jgu-navy);padding:26px 40px;display:flex;align-items:center;gap:20px}
+.sheet-head img{height:64px}.sheet-head .sh-txt h2{color:var(--jgu-navy);font-size:20px}.sheet-head .sh-txt p{font-size:12.5px;color:var(--muted)}
+.sheet-title{text-align:center;padding:16px;background:var(--jgu-navy);color:#fff;font-size:16px;font-weight:700;letter-spacing:1px}
+.sheet-body{padding:30px 40px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 30px;margin-bottom:24px;font-size:14px}
+.info-grid .r{display:flex;justify-content:space-between;border-bottom:1px dotted var(--border);padding:6px 0}
+.info-grid .r b{color:var(--jgu-navy)}
+table.marks{width:100%;border-collapse:collapse;font-size:13.5px}
+table.marks th{background:var(--jgu-navy);color:#fff;padding:10px 12px;text-align:left}
+table.marks td{padding:9px 12px;border:1px solid var(--border)}
+table.marks tr:nth-child(even){background:var(--jgu-light)}
+table.marks tfoot td{font-weight:700;background:#eef3fb}
+.grade-pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700;color:#fff}
+.sheet-foot{padding:24px 40px;display:flex;justify-content:space-between;align-items:flex-end;font-size:12px;color:var(--muted)}
+.sign{text-align:center}.sign .line{border-top:1.5px solid var(--text);width:170px;margin-bottom:5px;padding-top:5px}
+
+.cert-pages{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.cert-page{background:#fff;width:520px;min-height:720px;position:relative;padding:0;border:1px solid #cfd6e0;box-shadow:0 8px 30px rgba(0,0,0,.10)}
+.cert-inner{padding:40px 46px;text-align:center;position:relative;height:100%}
+.cert-toprow{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.cert-logobox{flex:1;text-align:center;padding-top:6px}
+.cert-logobox img{height:90px}
+.cert-photo{width:110px;height:130px;border:1.5px solid #222;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#555;text-align:center;line-height:1.4;flex-shrink:0;overflow:hidden}
+.cert-photo img{width:100%;height:100%;object-fit:cover}
+.cert-body p{font-size:13.5px;font-weight:700;line-height:1.5;margin-bottom:12px}
+.cert-field{font-family:Georgia,serif;font-size:22px;font-weight:700;color:#0b2a5b;margin:6px 0 12px;letter-spacing:.5px}
+.cert-field.big{font-size:24px}
+.cert-uni-name{font-size:15px;font-weight:700;color:#0b2a5b;line-height:1.4;margin:6px 0 12px}
+.cert-witness{font-size:12.5px;font-weight:700;line-height:1.55;margin-top:22px}
+.cert-signs{display:flex;justify-content:space-around;margin-top:40px;padding:0 4px;gap:12px;align-items:flex-end}
+.cert-signs .s{min-width:110px;max-width:150px;text-align:center}
+.cert-signs .sig-img{height:40px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:3px}
+.cert-signs .sig-img img{max-height:40px;max-width:130px}
+.cert-signs .s .name{font-style:italic;font-size:13px;border-top:1px solid #333;padding-top:5px}
+.cert-back{text-align:left;padding-top:70px}
+.cert-back ol{margin:0 0 24px 20px;font-size:14px;line-height:2}
+.cert-back ol li{font-weight:700;padding-left:6px}
+.cert-back ol li span{font-weight:400;color:#333}
+.cert-idblock{font-size:14px;font-weight:700;line-height:1.7;margin-top:10px}
+.cert-idblock span{font-weight:400;color:#333;display:block;margin-top:6px;border-bottom:1px dotted #999;min-height:22px}
+.cert-verify{position:absolute;bottom:24px;left:46px;right:46px;font-size:10.5px;color:var(--muted);letter-spacing:.5px;text-align:center;border-top:1px solid var(--border);padding-top:10px}
+
+.action-bar{display:flex;gap:12px;justify-content:center;margin:24px 0;flex-wrap:wrap}
+.demo-note{max-width:1064px;margin:0 auto 18px;background:#eef7f0;border:1px solid #cfe6d6;border-radius:8px;padding:12px 16px;font-size:12.5px;color:#25603f}
+
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--border);margin-bottom:22px;flex-wrap:wrap}
+.tabs button{padding:11px 18px;background:none;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px}
+.tabs button.active{color:var(--jgu-navy);border-bottom-color:var(--jgu-accent)}
+table.data{width:100%;border-collapse:collapse;background:#fff;font-size:13.5px}
+table.data th{background:var(--jgu-light);color:var(--jgu-navy);padding:12px 14px;text-align:left;font-size:12.5px;border-bottom:2px solid var(--border)}
+table.data td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.data tr:hover td{background:#fafbfd}
+.pill{display:inline-block;padding:3px 11px;border-radius:20px;font-size:11.5px;font-weight:600}
+.pill.green{background:#e8f6ee;color:var(--ok)}.pill.amber{background:#fef6e0;color:#b7791f}
+.pill.red{background:#fdecea;color:var(--warn)}.pill.blue{background:#e8f0fc;color:var(--jgu-blue)}
+.pill.gray{background:#eef1f5;color:var(--muted)}
+
+.modal-bg{position:fixed;inset:0;background:rgba(11,26,45,.55);display:flex;align-items:flex-start;justify-content:center;z-index:100;padding:40px 20px;overflow-y:auto}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:640px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.modal.wide{max-width:820px}
+.modal-h{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-h h3{color:var(--jgu-navy);font-size:18px}
+.modal-h .x{background:none;font-size:24px;color:var(--muted);line-height:1}
+.modal-b{padding:24px;max-height:65vh;overflow-y:auto}
+.modal-f{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+
+.mini-toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.search-box{flex:1;min-width:200px;padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:14px}
+.empty{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty .big{font-size:40px;margin-bottom:10px}
+.q-editor{border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;background:#fafbfd}
+.q-editor .qh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.q-editor .qh b{color:var(--jgu-navy)}
+.opt-edit{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.opt-edit input[type=text]{flex:1;padding:8px 11px;border:1.5px solid var(--border);border-radius:7px}
+.opt-edit label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.badge-correct{background:var(--ok);color:#fff;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600}
+.mod-edit{border:1px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.mod-edit-h{background:var(--jgu-light);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mod-edit-h input{flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:6px;font-weight:600}
+.les-row{padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:center}
+.les-row .li{flex:1}
+.les-row .li b{font-size:13.5px}.les-row .li span{font-size:12px;color:var(--muted)}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--jgu-navy);color:#fff;padding:14px 22px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.25);z-index:200;font-size:14px;opacity:0;transform:translateY(20px);transition:.3s}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.err{background:var(--warn)}
+
+@media(max-width:900px){
+  .two-col{grid-template-columns:1fr}
+  .stat-row,.result-stats{grid-template-columns:repeat(2,1fr)}
+  .login-left{display:none}.brand-txt{display:none}
+  .info-grid,.field.row2{grid-template-columns:1fr}
+  .side-card{position:static}
+}
+@media print{
+  body{background:#fff}
+  .topbar,.action-bar,.no-print,.demo-note{display:none!important}
+  .app-shell{padding:0;max-width:100%}
+  .sheet{border:none;box-shadow:none;margin:0}
+  .cert-pages{display:block}
+  .cert-page{width:100%;min-height:auto;border:none;box-shadow:none;page-break-after:always}
+  .cert-page:last-child{page-break-after:auto}
+  @page{margin:14mm}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal-root"></div>
+<div id="toast" class="toast"></div>
+<script>
+const LOGO="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20340%2084%22%3E%0A%3Cdefs%3E%3ClinearGradient%20id%3D%22g2%22%20x1%3D%220%22%20y1%3D%221%22%20x2%3D%221%22%20y2%3D%220%22%3E%0A%3Cstop%20offset%3D%220%22%20stop-color%3D%22%230b2a5b%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%231a4a94%22/%3E%3C/linearGradient%3E%3C/defs%3E%0A%3Crect%20x%3D%226%22%20y%3D%2210%22%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2215%22%20fill%3D%22url%28%23g2%29%22/%3E%0A%3Crect%20x%3D%2220%22%20y%3D%2246%22%20width%3D%229%22%20height%3D%2216%22%20rx%3D%222.5%22%20fill%3D%22%23c8a24a%22/%3E%0A%3Crect%20x%3D%2234%22%20y%3D%2238%22%20width%3D%229%22%20height%3D%2224%22%20rx%3D%222.5%22%20fill%3D%22%23e0c070%22/%3E%0A%3Crect%20x%3D%2248%22%20y%3D%2226%22%20width%3D%229%22%20height%3D%2236%22%20rx%3D%222.5%22%20fill%3D%22%23c8a24a%22/%3E%0A%3Cpath%20d%3D%22M44%2026%20l8.5%20-10%20l8.5%2010%20z%22%20fill%3D%22%23e0c070%22/%3E%0A%3Ctext%20x%3D%2286%22%20y%3D%2244%22%20font-family%3D%22Segoe%20UI%2CArial%2Csans-serif%22%20font-size%3D%2230%22%20font-weight%3D%22700%22%20fill%3D%22%230b2a5b%22%3EMiyee%3Ctspan%20fill%3D%22%23c8a24a%22%3EUpskill%3C/tspan%3E%3C/text%3E%0A%3Ctext%20x%3D%2288%22%20y%3D%2264%22%20font-family%3D%22Segoe%20UI%2CArial%2Csans-serif%22%20font-size%3D%2212.5%22%20letter-spacing%3D%222.5%22%20fill%3D%22%236a7788%22%3ELEARN%20%C2%B7%20ASSESS%20%C2%B7%20CERTIFY%3C/text%3E%0A%3C/svg%3E";
+const CERT_LOGO="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20120%20120%22%3E%0A%3Cdefs%3E%3ClinearGradient%20id%3D%22g3%22%20x1%3D%220%22%20y1%3D%221%22%20x2%3D%221%22%20y2%3D%220%22%3E%0A%3Cstop%20offset%3D%220%22%20stop-color%3D%22%230b2a5b%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%231a4a94%22/%3E%3C/linearGradient%3E%3C/defs%3E%0A%3Ccircle%20cx%3D%2260%22%20cy%3D%2260%22%20r%3D%2256%22%20fill%3D%22none%22%20stroke%3D%22%23c8a24a%22%20stroke-width%3D%223%22/%3E%0A%3Ccircle%20cx%3D%2260%22%20cy%3D%2260%22%20r%3D%2248%22%20fill%3D%22url%28%23g3%29%22/%3E%0A%3Crect%20x%3D%2242%22%20y%3D%2264%22%20width%3D%228%22%20height%3D%2216%22%20rx%3D%222%22%20fill%3D%22%23c8a24a%22/%3E%0A%3Crect%20x%3D%2256%22%20y%3D%2254%22%20width%3D%228%22%20height%3D%2226%22%20rx%3D%222%22%20fill%3D%22%23e0c070%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%2242%22%20width%3D%228%22%20height%3D%2238%22%20rx%3D%222%22%20fill%3D%22%23c8a24a%22/%3E%0A%3Cpath%20d%3D%22M66%2042%20l8%20-10%20l8%2010%20z%22%20fill%3D%22%23e0c070%22/%3E%0A%3Ctext%20x%3D%2260%22%20y%3D%22104%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2211%22%20font-weight%3D%22700%22%20fill%3D%22%230b2a5b%22%3EMIYEE%3C/text%3E%0A%3C/svg%3E";
+</script>
+<script>
+/* ============================================================
+   STORAGE ENGINE — persists to localStorage (survives reload)
+   ============================================================ */
+const SK = "miyeeupskill_lms_v1";
+const SCHEMA_VERSION = 3;
+
+function loadDB(){
+  try{ const raw=localStorage.getItem(SK); if(raw) return migrateDB(JSON.parse(raw)); }catch(e){ console.warn('loadDB failed',e); }
+  return null;
+}
+
+/* Schema migration — keeps old saved data working when new fields are added */
+function migrateDB(db){
+  if(!db || typeof db!=='object') return null;
+  db._v = db._v || 1;
+  // default containers
+  db.settings = db.settings || {};
+  db.admins = Array.isArray(db.admins)?db.admins:[];
+  db.students = Array.isArray(db.students)?db.students:[];
+  db.courses = Array.isArray(db.courses)?db.courses:[];
+  db.progress = db.progress || {};
+  db.attempts = db.attempts || {};
+  // v1 -> v2: add grading scale, cert toggles, defaults, audit log
+  const S0 = db.settings;
+  if(S0.gradeScale===undefined) S0.gradeScale = { A:80, B:70, C:60, D:50 };
+  if(S0.showPhoto===undefined) S0.showPhoto = true;
+  if(S0.showGovId===undefined) S0.showGovId = true;
+  if(S0.showVerify===undefined) S0.showVerify = true;
+  if(S0.defaultPassMark===undefined) S0.defaultPassMark = 50;
+  if(S0.defaultNeg===undefined) S0.defaultNeg = 0;
+  if(S0.certPrefix===undefined) S0.certPrefix = "MU";
+  if(S0.signCount===undefined) S0.signCount = 3;
+  if(S0.sigImg1===undefined) S0.sigImg1 = "";
+  if(S0.sigImg2===undefined) S0.sigImg2 = "";
+  if(S0.sigImg3===undefined) S0.sigImg3 = "";
+  if(S0.allowSignup===undefined) S0.allowSignup = true;
+  if(S0.universityName===undefined) S0.universityName = "MIYEEUPSKILL";
+  if(S0.universitySub===undefined) S0.universitySub = "Professional Skilling · Learn · Assess · Certify";
+  if(S0.sign1===undefined) S0.sign1="Course Director";
+  if(S0.sign2===undefined) S0.sign2="Head of Assessments";
+  if(S0.sign3===undefined) S0.sign3="Founder & CEO";
+  if(S0.verifyUrl===undefined) S0.verifyUrl="verify.miyeeupskill.com";
+  // ensure per-question marks defaults on all questions
+  db.courses.forEach(c=>{
+    // v2->v3: wrap flat course (modules+assessment) into semesters[]
+    if(!Array.isArray(c.semesters)){
+      c.semesters = [{
+        id: (c.id||'c')+'_s1',
+        name: 'Semester 1',
+        modules: Array.isArray(c.modules)?c.modules:[],
+        assessment: c.assessment || {title:'Semester 1 Assessment',passMark:(db.settings.defaultPassMark||50),durationMins:20,questions:[]}
+      }];
+    }
+    // normalise each semester
+    c.semesters.forEach((sem,si)=>{
+      if(!sem.id) sem.id=(c.id||'c')+'_s'+(si+1);
+      if(!sem.name) sem.name='Semester '+(si+1);
+      if(!Array.isArray(sem.modules)) sem.modules=[];
+      if(!sem.assessment) sem.assessment={title:sem.name+' Assessment',passMark:(db.settings.defaultPassMark||50),durationMins:20,questions:[]};
+      if(!Array.isArray(sem.assessment.questions)) sem.assessment.questions=[];
+      sem.assessment.questions.forEach(q=>{ if(q.marks==null) q.marks=1; if(q.neg==null) q.neg=0; });
+      sem.modules.forEach(m=>(m.lessons||[]).forEach(l=>{ if(l.video==null) l.video=""; }));
+    });
+    // keep legacy fields for any old refs but they are no longer primary
+  });
+  db.students.forEach(s=>{ if(!Array.isArray(s.enrolled)) s.enrolled=[]; if(s.photo==null) s.photo=""; });
+  db._v = SCHEMA_VERSION;
+  return db;
+}
+
+/* Robust save with quota detection; returns true/false */
+function saveDB(silent){
+  try{
+    localStorage.setItem(SK, JSON.stringify(DB));
+    return true;
+  }catch(e){
+    const quota = e && (e.name==='QuotaExceededError' || e.code===22 || e.code===1014 || /quota/i.test(e.message||''));
+    if(!silent) toast(quota?'⚠ Storage is full — export a backup, then remove large photos/videos':'Storage blocked (try a normal browser window)','err');
+    return false;
+  }
+}
+
+/* Storage usage estimate (localStorage cap is ~5MB in most browsers) */
+function storageUsage(){
+  let bytes=0;
+  try{ const raw=localStorage.getItem(SK)||''; bytes = new Blob([raw]).size; }catch(e){}
+  const cap = 5*1024*1024; // ~5MB typical
+  return { bytes, cap, pct: Math.min(100, Math.round(bytes/cap*100)), kb:(bytes/1024).toFixed(0) };
+}
+
+/* ---------- SEED DATA (first run only) ---------- */
+function seedDB(){
+  return {
+    settings:{
+      universityName:"MIYEEUPSKILL",
+      universitySub:"Professional Skilling · Learn · Assess · Certify",
+      sign1:"Course Director", sign2:"Head of Assessments", sign3:"Founder & CEO",
+      verifyUrl:"verify.miyeeupskill.com",
+      gradeScale:{ A:80, B:70, C:60, D:50 },
+      showPhoto:true, showGovId:true, showVerify:true,
+      defaultPassMark:50, defaultNeg:0, certPrefix:"MU",
+      signCount:3, sigImg1:"", sigImg2:"", sigImg3:"", allowSignup:true
+    },
+    admins:[ {email:"admin@miyeeupskill.com", pass:"Miyee@2025", name:"MiyeeUpskill Admin"} ],
+    students:[
+      {id:"MU-25-1001", name:"Rahul Nair", email:"rahul@student.miyee.com", pass:"demo1234", phone:"9876500001", govId:"ABCDE1234F", photo:"", admitDate:"01 April 2025", enrolled:["gst","itr"]},
+      {id:"MU-25-1002", name:"Sneha Patel", email:"sneha@student.miyee.com", pass:"demo1234", phone:"9876500002", govId:"BXYZP5678K", photo:"", admitDate:"01 April 2025", enrolled:["fpa1"]}
+    ],
+    courses:[
+      {
+        id:"gst", title:"GST Filing Course", tag:"Certificate Program",
+        school:"MiyeeUpskill School of Taxation",
+        duration:"6 Weeks", credits:6, level:"Professional",
+        desc:"A practical, hands-on course on Goods and Services Tax (GST) return filing in India — covering registration, invoicing, GSTR-1, GSTR-3B, GSTR-9, input tax credit, e-way bills and reconciliation, with real filing workflows.",
+        semesters:[{ id:"gst_s1", name:"Module 1 — GST Fundamentals & Filing", modules:[
+          {id:"gst_m1", name:"Foundations of GST", lessons:[
+            {id:"gst_l1", title:"Introduction to GST & Structure (CGST/SGST/IGST)", type:"video", mins:22, video:"", body:"Understand the GST framework in India, the dual structure of CGST, SGST and IGST, and how tax flows across the supply chain."},
+            {id:"gst_l2", title:"GST Registration & GSTIN", type:"video", mins:20, video:"", body:"Who must register, threshold limits, the registration process on the GST portal, and understanding the 15-digit GSTIN."},
+            {id:"gst_l3", title:"Tax Invoices, HSN/SAC & E-Way Bills", type:"video", mins:24, video:"", body:"Preparing compliant tax invoices, HSN/SAC codes, and generating e-way bills for movement of goods."}
+          ]},
+          {id:"gst_m2", name:"Returns & Input Tax Credit", lessons:[
+            {id:"gst_l4", title:"Filing GSTR-1 (Outward Supplies)", type:"video", mins:26, video:"", body:"Step-by-step filing of GSTR-1, reporting B2B and B2C sales, amendments, and JSON upload."},
+            {id:"gst_l5", title:"Filing GSTR-3B (Summary Return)", type:"video", mins:24, video:"", body:"Preparing and filing the monthly GSTR-3B summary, tax payment, and offsetting liability with ITC."},
+            {id:"gst_l6", title:"Input Tax Credit & Reconciliation (GSTR-2B)", type:"video", mins:22, video:"", body:"Claiming ITC correctly, matching with GSTR-2B, blocked credits, and reconciliation best practices."},
+            {id:"gst_l7", title:"Annual Return GSTR-9 & Common Errors", type:"reading", mins:20, video:"", body:"Overview of the annual return, reconciliation statement, and the most common filing mistakes to avoid."}
+          ]}
+        ], assessment:{ title:"GST Filing Assessment", passMark:50, durationMins:15, questions:[
+            {q:"GST in India is a tax on:", opts:["Income","Supply of goods and services","Property only","Salary"], correct:1, marks:1, neg:0},
+            {q:"The full form of GST is:", opts:["General Sales Tax","Goods and Services Tax","Gross Service Tax","Government Service Tax"], correct:1, marks:1, neg:0},
+            {q:"GSTR-1 is a return for reporting:", opts:["Purchases","Outward supplies (sales)","TDS","Refunds"], correct:1, marks:1, neg:0},
+            {q:"GSTR-3B is primarily a:", opts:["Annual return","Monthly summary return","Refund form","Registration form"], correct:1, marks:1, neg:0},
+            {q:"Input Tax Credit (ITC) allows a taxpayer to:", opts:["Avoid filing","Set off tax paid on purchases against output tax","Skip payment","Get a loan"], correct:1, marks:1, neg:0},
+            {q:"The threshold turnover for regular GST registration for goods (most states) is:", opts:["Rs 10 lakh","Rs 40 lakh","Rs 1 crore","Rs 5 lakh"], correct:1, marks:1, neg:0},
+            {q:"A GSTIN is how many characters long?", opts:["10","12","15","16"], correct:2, marks:1, neg:0},
+            {q:"Which return is the annual GST return?", opts:["GSTR-1","GSTR-3B","GSTR-9","GSTR-2A"], correct:2, marks:1, neg:0},
+            {q:"The composition scheme is meant for:", opts:["Large companies","Small taxpayers with lower turnover","Exporters only","Government bodies"], correct:1, marks:1, neg:0},
+            {q:"HSN code is used to classify:", opts:["Services only","Goods","Taxpayers","States"], correct:1, marks:1, neg:0}
+          ]} }]
+      },
+      {
+        id:"itr", title:"Income Tax ITR Filing Course", tag:"Certificate Program",
+        school:"MiyeeUpskill School of Taxation",
+        duration:"6 Weeks", credits:6, level:"Professional",
+        desc:"Learn to file Income Tax Returns (ITR) in India end-to-end — income heads, deductions, regime selection, Form 16 and 26AS, capital gains, and e-filing of ITR-1 to ITR-4 with practical examples.",
+        semesters:[{ id:"itr_s1", name:"Module 1 — Income Tax & ITR Filing", modules:[
+          {id:"itr_m1", name:"Income Tax Basics", lessons:[
+            {id:"itr_l1", title:"Income Tax Framework, FY & AY", type:"video", mins:20, video:"", body:"Understand the Income Tax Act structure, financial year vs assessment year, and residential status."},
+            {id:"itr_l2", title:"The Five Heads of Income", type:"video", mins:24, video:"", body:"Salary, house property, business/profession, capital gains, and income from other sources explained with examples."},
+            {id:"itr_l3", title:"Deductions (80C, 80D & others) and Regimes", type:"video", mins:22, video:"", body:"Chapter VI-A deductions and choosing between the old and new tax regimes."}
+          ]},
+          {id:"itr_m2", name:"Filing the Return", lessons:[
+            {id:"itr_l4", title:"Reading Form 16 & Form 26AS / AIS", type:"video", mins:22, video:"", body:"How to read Form 16, the 26AS tax credit statement, and the Annual Information Statement (AIS)."},
+            {id:"itr_l5", title:"Choosing the Right ITR Form (ITR-1 to ITR-4)", type:"video", mins:20, video:"", body:"Selecting the correct ITR form based on income sources and taxpayer category."},
+            {id:"itr_l6", title:"Capital Gains & Reporting", type:"video", mins:24, video:"", body:"Computing short-term and long-term capital gains on shares, mutual funds and property."},
+            {id:"itr_l7", title:"E-Filing, Verification & Refunds", type:"reading", mins:22, video:"", body:"Filing on the income tax portal, e-verification, tracking refunds, and revised returns."}
+          ]}
+        ], assessment:{ title:"ITR Filing Assessment", passMark:50, durationMins:15, questions:[
+            {q:"ITR stands for:", opts:["Income Tax Refund","Income Tax Return","Indian Tax Rule","Income Total Report"], correct:1, marks:1, neg:0},
+            {q:"The Indian financial year runs from:", opts:["Jan to Dec","April to March","July to June","Oct to Sept"], correct:1, marks:1, neg:0},
+            {q:"Which ITR form is typically used by a salaried individual with one house property?", opts:["ITR-1 (Sahaj)","ITR-4","ITR-6","ITR-7"], correct:0, marks:1, neg:0},
+            {q:"Form 16 is issued by:", opts:["The bank","The employer","The IT department","The auditor"], correct:1, marks:1, neg:0},
+            {q:"Section 80C allows deduction up to:", opts:["Rs 50,000","Rs 1,50,000","Rs 2,00,000","Rs 5,00,000"], correct:1, marks:1, neg:0},
+            {q:"The 'Assessment Year' is the year:", opts:["Income is earned","Income is assessed/taxed (following the FY)","Of registration","Of refund"], correct:1, marks:1, neg:0},
+            {q:"TDS stands for:", opts:["Tax Deducted at Source","Total Due Sum","Tax Deposit Scheme","Total Deduction Statement"], correct:0, marks:1, neg:0},
+            {q:"Form 26AS is a:", opts:["Salary slip","Consolidated tax credit statement","Refund form","Registration form"], correct:1, marks:1, neg:0},
+            {q:"Which head covers salary, house property, business, capital gains and other sources?", opts:["GST heads","Heads of Income","Tax slabs","Deductions"], correct:1, marks:1, neg:0},
+            {q:"Long-term capital gains on listed equity above Rs 1 lakh are taxed at:", opts:["5%","10%","20%","30%"], correct:1, marks:1, neg:0}
+          ]} }]
+      },
+      {
+        id:"fcra", title:"FCRA Compliance Course", tag:"Certificate Program",
+        school:"MiyeeUpskill School of Compliance",
+        duration:"4 Weeks", credits:4, level:"Professional",
+        desc:"A focused course on Foreign Contribution (Regulation) Act (FCRA) compliance for NGOs and non-profits — registration, designated bank accounts, utilisation rules, record-keeping, and annual return (FC-4) filing.",
+        semesters:[{ id:"fcra_s1", name:"Module 1 — FCRA Compliance Essentials", modules:[
+          {id:"fcra_m1", name:"FCRA Framework", lessons:[
+            {id:"fcra_l1", title:"Introduction to FCRA & Applicability", type:"video", mins:20, video:"", body:"What FCRA is, why it exists, who it applies to, and the role of the Ministry of Home Affairs."},
+            {id:"fcra_l2", title:"Registration & Prior Permission", type:"video", mins:22, video:"", body:"Eligibility, the registration process, prior permission route, and validity/renewal."},
+            {id:"fcra_l3", title:"Designated FCRA Bank Account & Receipt Rules", type:"video", mins:20, video:"", body:"The SBI designated account requirement, receiving foreign contributions, and prohibited sources."}
+          ]},
+          {id:"fcra_m2", name:"Utilisation & Reporting", lessons:[
+            {id:"fcra_l4", title:"Utilisation Rules & Administrative Expense Cap", type:"video", mins:22, video:"", body:"Permitted uses of foreign contribution, the administrative expense limit, and prohibitions."},
+            {id:"fcra_l5", title:"Books of Account & Record-Keeping", type:"reading", mins:18, video:"", body:"Maintaining separate books for FC funds, asset registers, and audit requirements."},
+            {id:"fcra_l6", title:"Annual Return FC-4 Filing & Compliance Calendar", type:"video", mins:22, video:"", body:"Filing the annual FC-4 return, disclosures, due dates, and consequences of non-compliance."}
+          ]}
+        ], assessment:{ title:"FCRA Compliance Assessment", passMark:50, durationMins:12, questions:[
+            {q:"FCRA stands for:", opts:["Foreign Contribution Regulation Act","Financial Compliance Regulation Act","Foreign Currency Reserve Act","Federal Contribution Rules Act"], correct:0, marks:1, neg:0},
+            {q:"FCRA primarily regulates:", opts:["Domestic donations","Foreign contributions to Indian entities","Company taxes","Import duties"], correct:1, marks:1, neg:0},
+            {q:"Which ministry administers FCRA?", opts:["Ministry of Finance","Ministry of Home Affairs","Ministry of Corporate Affairs","RBI"], correct:1, marks:1, neg:0},
+            {q:"An organisation receiving foreign contribution must be:", opts:["Unregistered","Registered or have prior permission under FCRA","A company only","A trust only"], correct:1, marks:1, neg:0},
+            {q:"FCRA funds must be received in:", opts:["Any bank account","A designated FCRA bank account","Cash","A foreign account"], correct:1, marks:1, neg:0},
+            {q:"The annual FCRA return is filed in form:", opts:["FC-3","FC-6","FC-4","FC-1"], correct:0, marks:1, neg:0},
+            {q:"FCRA registration is generally valid for:", opts:["1 year","3 years","5 years","10 years"], correct:2, marks:1, neg:0},
+            {q:"Foreign contribution can be used for:", opts:["Any purpose","The defined purposes for which it was received","Personal use","Political funding"], correct:1, marks:1, neg:0},
+            {q:"Which of these is a key FCRA compliance requirement?", opts:["No records needed","Maintaining separate books of account for FC funds","Mixing funds","Cash withdrawals"], correct:1, marks:1, neg:0},
+            {q:"Administrative expenses out of FC funds are capped at (as per rules):", opts:["10%","20%","50%","No limit"], correct:1, marks:1, neg:0}
+          ]} }]
+      },
+      {
+        id:"fpa1", title:"Certificate Course on FP&A — Level 1", tag:"Certificate Program",
+        school:"MiyeeUpskill School of Finance",
+        duration:"8 Weeks", credits:8, level:"Professional",
+        desc:"An introduction to Financial Planning & Analysis (FP&A) — budgeting, forecasting, variance analysis, driver-based modelling, and management reporting. Build the core skills to support data-driven business decisions.",
+        semesters:[{ id:"fpa1_s1", name:"Module 1 — FP&A Foundations", modules:[
+          {id:"fpa_m1", name:"Planning & Budgeting", lessons:[
+            {id:"fpa_l1", title:"What is FP&A? Role & Value", type:"video", mins:20, video:"", body:"The role of FP&A in an organisation, how it differs from accounting, and the value it adds to decisions."},
+            {id:"fpa_l2", title:"Budgeting Fundamentals", type:"video", mins:24, video:"", body:"Types of budgets, the budgeting process, top-down vs bottom-up, and building an operating budget."},
+            {id:"fpa_l3", title:"Forecasting & Rolling Forecasts", type:"video", mins:22, video:"", body:"Forecasting techniques, assumptions, and maintaining a rolling forecast."}
+          ]},
+          {id:"fpa_m2", name:"Analysis & Reporting", lessons:[
+            {id:"fpa_l4", title:"Variance Analysis", type:"video", mins:22, video:"", body:"Comparing actuals to plan, understanding favourable/unfavourable variances, and driving action."},
+            {id:"fpa_l5", title:"Driver-Based Modelling Basics", type:"video", mins:24, video:"", body:"Linking financial outputs to business drivers to build flexible, insightful models."},
+            {id:"fpa_l6", title:"Management Reporting & KPIs", type:"video", mins:20, video:"", body:"Designing clear management reports and dashboards with meaningful KPIs."},
+            {id:"fpa_l7", title:"Introduction to the Three Financial Statements", type:"reading", mins:22, video:"", body:"How the P&L, balance sheet and cash flow connect — the foundation for any FP&A model."}
+          ]}
+        ], assessment:{ title:"FP&A Level 1 Assessment", passMark:50, durationMins:18, questions:[
+            {q:"FP&A stands for:", opts:["Financial Planning & Analysis","Fiscal Policy & Audit","Fund Planning & Allocation","Forecasting Profit & Assets"], correct:0, marks:1, neg:0},
+            {q:"The primary purpose of FP&A is to:", opts:["File taxes","Support business decisions through planning, budgeting and analysis","Audit accounts","Register companies"], correct:1, marks:1, neg:0},
+            {q:"A budget is best described as:", opts:["A past record","A financial plan for a future period","A tax return","An invoice"], correct:1, marks:1, neg:0},
+            {q:"Variance analysis compares:", opts:["Two companies","Actual results against budget/forecast","Two years of tax","Assets and liabilities"], correct:1, marks:1, neg:0},
+            {q:"A rolling forecast is:", opts:["Fixed once a year","Continuously updated for future periods","Only historical","A tax form"], correct:1, marks:1, neg:0},
+            {q:"Which statement shows profitability over a period?", opts:["Balance sheet","Profit & Loss (Income) statement","Cash flow only","Trial balance"], correct:1, marks:1, neg:0},
+            {q:"CapEx refers to:", opts:["Daily expenses","Capital expenditure on long-term assets","Cash export","Capital exemption"], correct:1, marks:1, neg:0},
+            {q:"A key FP&A driver-based model links outputs to:", opts:["Random numbers","Business drivers/assumptions","Only last year","Tax rates"], correct:1, marks:1, neg:0},
+            {q:"EBITDA stands for earnings before interest, taxes, depreciation and:", opts:["Assets","Amortisation","Audit","Allocation"], correct:1, marks:1, neg:0},
+            {q:"A good KPI should be:", opts:["Vague","Measurable and aligned to objectives","Unrelated to goals","Secret"], correct:1, marks:1, neg:0}
+          ]} }]
+      }
+    ],
+    /* progress + attempts keyed by studentId -> courseId */
+    progress:{},  // {studentId:{courseId:{done:[lessonIds]}}}
+    attempts:{}   // {studentId:{courseId:{...attempt}}}
+  };
+}
+
+const BUILD_BRAND = "miyeeupskill-2025";
+let DB = loadDB();
+// If there's no data, OR the saved data is from an older/other brand build,
+// reseed so the correct MiyeeUpskill accounts and courses always exist.
+if(!DB || DB._brand !== BUILD_BRAND){
+  DB = migrateDB(seedDB());
+  DB._brand = BUILD_BRAND;
+  saveDB();
+}
+
+/* ---------- helpers ---------- */
+function uid(p){ return p+"_"+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function findCourse(id){ return DB.courses.find(c=>c.id===id); }
+function findStudent(id){ return DB.students.find(s=>s.id===id); }
+/* ---- semester-aware helpers ---- */
+function courseSemesters(c){ return Array.isArray(c.semesters)?c.semesters:[]; }
+function findSemester(c,semId){ return courseSemesters(c).find(s=>s.id===semId); }
+function semLessons(sem){ return (sem.modules||[]).flatMap(m=>m.lessons||[]); }
+function flatLessons(c){ return courseSemesters(c).flatMap(sem=>semLessons(sem)); } // whole course
+function lessonCount(c){ return flatLessons(c).length; }
+function semLessonCount(sem){ return semLessons(sem).length; }
+function nextStudentId(){
+  const yr=new Date().getFullYear().toString().slice(2);
+  const nums=DB.students.map(s=>parseInt((s.id.split('-')[3]||'1000'),10)).filter(n=>!isNaN(n));
+  const max=nums.length?Math.max(...nums):1000;
+  return "MU-"+yr+"-"+(max+1);
+}
+function getProgress(sid,cid){ return (DB.progress[sid]&&DB.progress[sid][cid])||{done:[]}; }
+function setLessonDone(sid,cid,lid){
+  DB.progress[sid]=DB.progress[sid]||{};
+  DB.progress[sid][cid]=DB.progress[sid][cid]||{done:[]};
+  if(!DB.progress[sid][cid].done.includes(lid)) DB.progress[sid][cid].done.push(lid);
+  saveDB();
+}
+function courseProgress(sid,c){
+  const total=lessonCount(c);
+  const done=getProgress(sid,c.id).done.length;
+  return {total,done,pct:total?Math.round(done/total*100):0};
+}
+function semProgress(sid,c,sem){
+  const lessons=semLessons(sem);
+  const done=getProgress(sid,c.id).done;
+  const d=lessons.filter(l=>done.includes(l.id)).length;
+  return {total:lessons.length,done:d,pct:lessons.length?Math.round(d/lessons.length*100):0};
+}
+/* attempt keys: semester attempts use "cid::semId" */
+function attKey(cid,semId){ return cid+"::"+semId; }
+function getAttempt(sid,cid){ return DB.attempts[sid]&&DB.attempts[sid][cid]; } // legacy/course-level
+function getSemAttempt(sid,cid,semId){ return DB.attempts[sid]&&DB.attempts[sid][attKey(cid,semId)]; }
+function saveAttempt(sid,cid,att){ DB.attempts[sid]=DB.attempts[sid]||{}; DB.attempts[sid][cid]=att; saveDB(); }
+function saveSemAttempt(sid,cid,semId,att){ DB.attempts[sid]=DB.attempts[sid]||{}; DB.attempts[sid][attKey(cid,semId)]=att; saveDB(); }
+function allSemestersPassed(sid,c){
+  const sems=courseSemesters(c);
+  if(!sems.length) return false;
+  return sems.every(sem=> getSemAttempt(sid,c.id,sem.id)?.passed );
+}
+function semUnlocked(sid,c,idx){
+  // semester i unlocked if all previous semesters passed
+  const sems=courseSemesters(c);
+  for(let i=0;i<idx;i++){ if(!getSemAttempt(sid,c.id,sems[i].id)?.passed) return false; }
+  return true;
+}
+function gradeFor(pct){
+  const gs=(DB.settings&&DB.settings.gradeScale)||{A:80,B:70,C:60,D:50};
+  if(pct>=gs.A) return {g:"A",label:"Outstanding",color:"#1f8a4c"};
+  if(pct>=gs.B) return {g:"B",label:"Very Good",color:"#2d7d46"};
+  if(pct>=gs.C) return {g:"C",label:"Good",color:"#b7791f"};
+  if(pct>=gs.D) return {g:"D",label:"Pass",color:"#c07a1f"};
+  return {g:"F",label:"Fail",color:"#c0392b"};
+}
+function certId(){ const px=(DB.settings&&DB.settings.certPrefix)||"MU"; return px+"/"+new Date().getFullYear()+"/"+Math.floor(100000+Math.random()*899999); }
+function today(){ return new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'}); }
+function esc(s){ return (s||'').toString().replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg,type){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show'+(type==='err'?' err':''); setTimeout(()=>t.className='toast',2600); }
+
+/* ---------- APP STATE ---------- */
+const S = { user:null, role:null, route:"login", courseId:null, lessonId:null, quiz:null, adminTab:"dashboard", modal:null };
+function go(r){ S.route=r; render(); window.scrollTo(0,0); }
+</script>
+<script>
+/* ============================================================
+   RENDER ROUTER + AUTH + STUDENT VIEWS
+   ============================================================ */
+const app=()=>document.getElementById('app');
+function render(){
+  const r=S.route;
+  if(r==="login") return renderLogin();
+  if(r==="signup") return renderSignup();
+  if(!S.user) return renderLogin();
+  if(r==="dashboard") return renderDashboard();
+  if(r==="catalogue") return renderCatalogue();
+  if(r==="account") return renderAccount();
+  if(r==="course") return renderCourse();
+  if(r==="lesson") return renderLesson();
+  if(r==="quiz") return renderQuiz();
+  if(r==="result") return renderResult();
+  if(r==="marksheet") return renderMarksheet();
+  if(r==="certificate") return renderCertificate();
+  if(r==="admin") return renderAdmin();
+  return renderLogin();
+}
+
+function topbar(){
+  const u=S.user;
+  const initials=(u.name||'U').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const links = S.role==='admin'
+    ? `<a onclick="go('admin')" style="font-weight:600;color:var(--jgu-navy)">Admin Console</a>`
+    : `<a onclick="go('dashboard')" style="font-weight:600;color:var(--jgu-navy)">My Courses</a>
+       <a onclick="go('catalogue')" style="font-weight:600;color:var(--jgu-navy)">Browse Courses</a>
+       <a onclick="go('account')" style="font-weight:600;color:var(--jgu-navy)">My Account</a>`;
+  return `<div class="topbar"><div class="topbar-inner">
+    <div class="brand"><img src="${LOGO}"><div class="brand-txt"><b>MiyeeUpskill</b>Learn · Assess · Certify</div></div>
+    <div class="nav-user">${links}
+      <div class="avatar">${initials}</div>
+      <div style="line-height:1.2"><div style="font-weight:600;font-size:13px">${esc(u.name)}</div><div style="font-size:11px;color:var(--muted)">${S.role==='admin'?'Administrator':esc(u.id)}</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Logout</button>
+    </div></div></div>`;
+}
+
+/* ---------- LOGIN ---------- */
+let loginRole='student';
+function renderLogin(){
+  const signupLink = DB.settings.allowSignup!==false
+    ? `<div style="text-align:center;margin-top:16px;font-size:14px">New student? <a onclick="go('signup')" style="font-weight:600">Create an account →</a></div>`
+    : '';
+  app().innerHTML=`<div class="login-wrap"><div class="login-card">
+    <div class="login-left">
+      <span class="lg-logo"><img src="${LOGO}"></span>
+      <h1>Learn. Assess. Get Certified.</h1>
+      <p>Practical, career-focused finance &amp; compliance courses with online assessments and verifiable certificates.</p>
+      <ul><li>Self-paced short-term certificate programmes</li><li>Semester online assessments with instant results</li><li>Printable marksheet &amp; official certificate</li><li>Career-focused finance &amp; compliance skills</li></ul>
+    </div>
+    <div class="login-right">
+      <h2>Sign in to continue</h2>
+      <div class="sub">Access your courses, assessments and certificates.</div>
+      <div class="role-tabs">
+        <button id="rt-s" class="active" onclick="setRole('student')">Student</button>
+        <button id="rt-a" onclick="setRole('admin')">Administrator</button>
+      </div>
+      <div class="field"><label>Email</label><input id="in-email" placeholder="you@email.com"></div>
+      <div class="field"><label>Password</label><input id="in-pass" type="password" placeholder="••••••••"></div>
+      <button class="btn" style="width:100%;padding:12px;font-size:15px" onclick="doLogin()">Sign In →</button>
+      <div id="login-err"></div>
+      <div id="signup-link">${signupLink}</div>
+      <div class="hint" id="login-hint">🔑 <b>Demo student:</b> rahul@student.miyee.com / demo1234</div>
+      <div style="text-align:center;margin-top:8px"><a onclick="resetLoginData()" style="font-size:11px;color:var(--muted)">Trouble signing in? Reset demo data</a></div>
+    </div>
+  </div></div>`;
+}
+function setRole(r){
+  loginRole=r;
+  document.getElementById('rt-s').classList.toggle('active',r==='student');
+  document.getElementById('rt-a').classList.toggle('active',r==='admin');
+  document.getElementById('login-hint').innerHTML = r==='admin'
+    ? '🔑 <b>Admin:</b> admin@miyeeupskill.com / Miyee@2025'
+    : '🔑 <b>Demo student:</b> rahul@student.miyee.com / demo1234';
+  const sl=document.getElementById('signup-link');
+  if(sl) sl.style.display = r==='admin' ? 'none' : 'block';
+  const e=document.getElementById('login-err'); if(e) e.innerHTML='';
+}
+function doLogin(){
+  const email=(document.getElementById('in-email').value||'').trim().toLowerCase();
+  const pass=(document.getElementById('in-pass').value||'');
+  const errBox=document.getElementById('login-err');
+  if(loginRole==='admin'){
+    const a=DB.admins.find(x=>x.email.toLowerCase()===email&&x.pass===pass);
+    if(!a){ errBox.innerHTML='<div class="err">Invalid admin credentials.</div>'; return; }
+    S.user={name:a.name,email:a.email}; S.role='admin'; S.adminTab='dashboard'; go('admin');
+  }else{
+    const s=DB.students.find(x=>x.email.toLowerCase()===email&&x.pass===pass);
+    if(!s){ errBox.innerHTML='<div class="err">Invalid email or password.</div>'; return; }
+    S.user=s; S.role='student'; go('dashboard');
+  }
+  toast('Welcome, '+S.user.name);
+}
+function logout(){ S.user=null;S.role=null;S.quiz=null;go('login'); }
+function resetLoginData(){
+  if(!confirm('Reset to fresh demo data? This clears any locally saved courses/students on this device and restores the default MiyeeUpskill demo accounts.')) return;
+  try{ localStorage.removeItem(SK); }catch(e){}
+  DB=migrateDB(seedDB()); DB._brand=BUILD_BRAND; saveDB();
+  toast('Demo data reset ✓ — use the credentials shown');
+  go('login');
+}
+
+/* ---------- STUDENT SELF-REGISTRATION ---------- */
+function renderSignup(){
+  app().innerHTML=`<div class="login-wrap"><div class="login-card">
+    <div class="login-left">
+      <span class="lg-logo"><img src="${LOGO}"></span>
+      <h1>Create your student account</h1>
+      <p>Join MiyeeUpskill and start building career-ready finance &amp; compliance skills today.</p>
+      <ul><li>Instant enrolment ID</li><li>Browse &amp; enrol in programmes</li><li>Track your semester progress</li><li>Earn a verifiable certificate</li></ul>
+    </div>
+    <div class="login-right">
+      <h2>Sign up</h2>
+      <div class="sub">Fill in your details to create an account.</div>
+      <div class="field"><label>Full Name *</label><input id="su-name" placeholder="e.g. Rahul Verma"></div>
+      <div class="field"><label>Email *</label><input id="su-email" placeholder="you@email.com"></div>
+      <div class="field row2"><div><label>Password *</label><input id="su-pass" type="password" placeholder="Min 6 characters"></div><div><label>Confirm Password *</label><input id="su-pass2" type="password" placeholder="Re-enter"></div></div>
+      <div class="field row2"><div><label>Phone</label><input id="su-phone" placeholder="Optional"></div><div><label>Govt ID No.</label><input id="su-gov" placeholder="For certificate (optional)"></div></div>
+      <button class="btn" style="width:100%;padding:12px;font-size:15px" onclick="doSignup()">Create Account →</button>
+      <div id="su-err"></div>
+      <div style="text-align:center;margin-top:14px;font-size:14px">Already have an account? <a onclick="go('login')" style="font-weight:600">Sign in →</a></div>
+    </div>
+  </div></div>`;
+}
+function doSignup(){
+  const g=id=>(document.getElementById(id).value||'').trim();
+  const name=g('su-name'), email=g('su-email').toLowerCase(), pass=document.getElementById('su-pass').value, pass2=document.getElementById('su-pass2').value;
+  const phone=g('su-phone'), gov=g('su-gov');
+  const err=document.getElementById('su-err');
+  if(!name||!email||!pass){ err.innerHTML='<div class="err">Name, email and password are required.</div>'; return; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ err.innerHTML='<div class="err">Please enter a valid email address.</div>'; return; }
+  if(pass.length<6){ err.innerHTML='<div class="err">Password must be at least 6 characters.</div>'; return; }
+  if(pass!==pass2){ err.innerHTML='<div class="err">Passwords do not match.</div>'; return; }
+  if(DB.students.find(s=>s.email.toLowerCase()===email) || DB.admins.find(a=>a.email.toLowerCase()===email)){
+    err.innerHTML='<div class="err">An account with this email already exists.</div>'; return;
+  }
+  const student={id:nextStudentId(),name,email,pass,phone,govId:gov,photo:"",admitDate:today(),enrolled:[]};
+  DB.students.push(student);
+  if(!saveDB()){ err.innerHTML='<div class="err">Could not save — storage may be full.</div>'; return; }
+  S.user=student; S.role='student';
+  toast('Account created! Welcome, '+name);
+  go('catalogue');
+}
+
+/* ---------- STUDENT DASHBOARD ---------- */
+function renderDashboard(){
+  const s=S.user;
+  const enrolled=DB.courses.filter(c=>(s.enrolled||[]).includes(c.id));
+  const cards=enrolled.map(c=>{
+    const p=courseProgress(s.id,c);
+    const allPassed=allSemestersPassed(s.id,c);
+    const sems=courseSemesters(c);
+    const passedCount=sems.filter(sem=>getSemAttempt(s.id,c.id,sem.id)?.passed).length;
+    let cta;
+    if(allPassed) cta=`<button class="btn btn-gold" onclick="viewAttempt('${c.id}')">🎓 View Certificate →</button>`;
+    else cta=`<button class="btn" onclick="openCourse('${c.id}')">${p.done>0?'Continue Learning':'Start Course'} →</button>`;
+    return `<div class="course-card">
+      <div class="course-banner"><span class="tag">${esc(c.tag)}</span><h3>${esc(c.title)}</h3></div>
+      <div class="course-body">
+        <div class="course-meta"><span>⏱ ${esc(c.duration)}</span><span>📘 ${c.credits} Credits</span><span>🎓 ${sems.length} Sem</span></div>
+        <div class="progress-bar"><i style="width:${p.pct}%"></i></div>
+        <div class="progress-lbl"><span>${passedCount}/${sems.length} semesters passed</span><span>${allPassed?'Certified ✓':p.pct+'%'}</span></div>
+        ${cta}
+      </div></div>`;
+  }).join('');
+  const certified=enrolled.filter(c=>allSemestersPassed(s.id,c)).length;
+  const inprog=enrolled.filter(c=>{const p=courseProgress(s.id,c);return p.done>0&&!allSemestersPassed(s.id,c);}).length;
+  app().innerHTML=topbar()+`<div class="app-shell">
+    <div class="page-head"><div><div class="crumb">Home / My Dashboard</div><h1>Welcome back, ${esc(s.name.split(' ')[0])} 👋</h1></div></div>
+    <div class="stat-row">
+      <div class="stat"><div class="n">${enrolled.length}</div><div class="l">Enrolled Programmes</div></div>
+      <div class="stat"><div class="n">${inprog}</div><div class="l">In Progress</div></div>
+      <div class="stat"><div class="n">${certified}</div><div class="l">Certificates Earned</div></div>
+      <div class="stat"><div class="n" style="font-size:16px">${esc(s.id)}</div><div class="l">Enrolment ID</div></div>
+    </div>
+    <div class="page-head"><h1 style="font-size:19px">My Programmes</h1></div>
+    ${enrolled.length?`<div class="course-grid">${cards}</div>`:`<div class="card"><div class="empty"><div class="big">📚</div>You are not enrolled in any programme yet.<br>Please contact the administrator.</div></div>`}
+  </div>`;
+}
+function openCourse(id){ S.courseId=id; go('course'); }
+
+/* ---------- COURSE CATALOGUE (self-enrol) ---------- */
+function renderCatalogue(){
+  const s=S.user;
+  const cards=DB.courses.map(c=>{
+    const enrolled=(s.enrolled||[]).includes(c.id);
+    const sems=courseSemesters(c);
+    return `<div class="course-card">
+      <div class="course-banner"><span class="tag">${esc(c.tag)}</span><h3>${esc(c.title)}</h3></div>
+      <div class="course-body">
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:10px">${esc(c.school||'')}</div>
+        <p style="font-size:13px;color:#334;margin-bottom:12px">${esc((c.desc||'').slice(0,120))}${(c.desc||'').length>120?'…':''}</p>
+        <div class="course-meta"><span>⏱ ${esc(c.duration)}</span><span>📘 ${c.credits} Credits</span><span>🎓 ${sems.length} Sem</span></div>
+        ${enrolled
+          ? `<button class="btn btn-ghost" onclick="openCourse('${c.id}')" style="margin-top:auto">✓ Enrolled — Open →</button>`
+          : `<button class="btn btn-gold" onclick="enrolSelf('${c.id}')" style="margin-top:auto">Enrol Now →</button>`}
+      </div></div>`;
+  }).join('');
+  app().innerHTML=topbar()+`<div class="app-shell">
+    <div class="page-head"><div><div class="crumb">Home / Browse Courses</div><h1>Course Catalogue</h1></div></div>
+    <p style="color:var(--muted);margin-bottom:20px">Explore available programmes and enrol yourself. Once enrolled, a course appears under "My Courses".</p>
+    ${DB.courses.length?`<div class="course-grid">${cards}</div>`:`<div class="card"><div class="empty"><div class="big">📚</div>No programmes available yet.</div></div>`}
+  </div>`;
+}
+function enrolSelf(cid){
+  const s=S.user;
+  if(!(s.enrolled||[]).includes(cid)){
+    s.enrolled=[...(s.enrolled||[]),cid];
+    // persist to the actual student record in DB
+    const rec=findStudent(s.id); if(rec) rec.enrolled=s.enrolled;
+    if(!saveDB()){ toast('Could not save enrolment','err'); return; }
+  }
+  const c=findCourse(cid);
+  toast('Enrolled in '+c.title+' ✓');
+  openCourse(cid);
+}
+
+/* ---------- MY ACCOUNT (profile + change password) ---------- */
+function renderAccount(){
+  const s=S.user;
+  const enrolledCourses=DB.courses.filter(c=>(s.enrolled||[]).includes(c.id));
+  app().innerHTML=topbar()+`<div class="app-shell">
+    <div class="page-head"><div><div class="crumb">Home / My Account</div><h1>My Account</h1></div></div>
+    <div class="two-col"><div>
+      <div class="card" style="margin-bottom:20px"><div class="card-h">Profile</div><div class="card-b">
+        <div class="field"><label>Full Name</label><input id="ac-name" value="${esc(s.name)}"></div>
+        <div class="field row2"><div><label>Email (login) — cannot be changed</label><input value="${esc(s.email)}" disabled style="background:var(--jgu-light)"></div><div><label>Enrolment ID</label><input value="${esc(s.id)}" disabled style="background:var(--jgu-light)"></div></div>
+        <div class="field row2"><div><label>Phone</label><input id="ac-phone" value="${esc(s.phone||'')}"></div><div><label>Govt ID No. (for certificate)</label><input id="ac-gov" value="${esc(s.govId||'')}"></div></div>
+        <div class="field"><label>Student Photo (for certificate)</label><input type="file" accept="image/*" onchange="acPhoto(this)">${s.photo?`<div style="margin-top:8px"><img src="${s.photo}" style="height:70px;border:1px solid var(--border);border-radius:6px"></div>`:''}</div>
+        <button class="btn btn-gold" onclick="saveAccount()">Save Profile</button>
+      </div></div>
+      <div class="card"><div class="card-h">Change Password</div><div class="card-b">
+        <div class="field"><label>Current Password</label><input id="ac-cur" type="password"></div>
+        <div class="field row2"><div><label>New Password</label><input id="ac-new" type="password" placeholder="Min 6 characters"></div><div><label>Confirm New Password</label><input id="ac-new2" type="password"></div></div>
+        <div id="ac-pwerr"></div>
+        <button class="btn" onclick="changePassword()">Update Password</button>
+      </div></div>
+    </div><div><div class="side-card">
+      <h4>My Enrolments</h4>
+      ${enrolledCourses.length?enrolledCourses.map(c=>{const pc=courseSemesters(c).filter(sem=>getSemAttempt(s.id,c.id,sem.id)?.passed).length;return `<div class="side-stat"><span>${esc(c.title).slice(0,24)}${c.title.length>24?'…':''}</span><b>${pc}/${courseSemesters(c).length} sem</b></div>`;}).join(''):'<div style="color:var(--muted);font-size:13px">No enrolments yet. <a onclick="go(\'catalogue\')">Browse courses →</a></div>'}
+    </div></div></div></div>`;
+}
+function acPhoto(inp){
+  const f=inp.files[0]; if(!f) return;
+  if(f.size>600*1024){ toast('Photo too large (max 600 KB)','err'); return; }
+  const r=new FileReader();
+  r.onload=e=>{ S.user.photo=e.target.result; const rec=findStudent(S.user.id); if(rec)rec.photo=S.user.photo; saveDB(); render(); toast('Photo updated ✓'); };
+  r.readAsDataURL(f);
+}
+function saveAccount(){
+  const g=id=>(document.getElementById(id).value||'').trim();
+  const rec=findStudent(S.user.id); if(!rec) return;
+  rec.name=g('ac-name')||rec.name; rec.phone=g('ac-phone'); rec.govId=g('ac-gov');
+  S.user=rec;
+  if(saveDB()) toast('Profile saved ✓');
+  render();
+}
+function changePassword(){
+  const cur=document.getElementById('ac-cur').value, nw=document.getElementById('ac-new').value, nw2=document.getElementById('ac-new2').value;
+  const err=document.getElementById('ac-pwerr');
+  const rec=findStudent(S.user.id);
+  if(rec.pass!==cur){ err.innerHTML='<div class="err">Current password is incorrect.</div>'; return; }
+  if(nw.length<6){ err.innerHTML='<div class="err">New password must be at least 6 characters.</div>'; return; }
+  if(nw!==nw2){ err.innerHTML='<div class="err">New passwords do not match.</div>'; return; }
+  rec.pass=nw; S.user=rec;
+  if(saveDB()){ err.innerHTML='<div style="color:var(--ok);font-size:13px;font-weight:600;margin-top:8px">✓ Password updated</div>'; toast('Password changed ✓'); }
+}
+function viewAttempt(cid){
+  S.courseId=cid;
+  const c=findCourse(cid);
+  if(allSemestersPassed(S.user.id,c)){ go('certificate'); }
+  else { go('course'); }
+}
+
+/* ---------- COURSE DETAIL (semester-based) ---------- */
+function renderCourse(){
+  const s=S.user, c=findCourse(S.courseId);
+  const done=getProgress(s.id,c.id).done;
+  const sems=courseSemesters(c);
+  const semBlocks=sems.map((sem,si)=>{
+    const sp=semProgress(s.id,c,sem);
+    const att=getSemAttempt(s.id,c.id,sem.id);
+    const unlocked=semUnlocked(s.id,c,si);
+    // modules within this semester
+    const mods=(sem.modules||[]).map(m=>{
+      const md=(m.lessons||[]).filter(l=>done.includes(l.id)).length;
+      const lessons=(m.lessons||[]).map(l=>{
+        const isDone=done.includes(l.id);
+        const click = unlocked ? `onclick="openLesson('${l.id}')"` : '';
+        return `<div class="lesson ${isDone?'done':''}" ${click} style="${unlocked?'':'opacity:.5;cursor:not-allowed'}">
+          <div class="ic">${isDone?'✓':(l.type==='video'?'▶':'📄')}</div>
+          <div class="lt"><b>${esc(l.title)}</b><span>${l.type==='video'?'Video':'Reading'} · ${l.mins} min</span></div>
+          <div class="lk">${unlocked?(isDone?'Review':'Start'):'🔒'}</div></div>`;
+      }).join('');
+      return `<div class="module"><div class="module-h">${esc(m.name)}<span class="mstat">${md}/${(m.lessons||[]).length} complete</span></div>${lessons}</div>`;
+    }).join('') || '<div style="padding:12px;color:var(--muted);font-size:13px">No lessons in this semester yet.</div>';
+    // semester action row
+    let action;
+    if(!unlocked){
+      action=`<span class="pill gray">🔒 Locked — pass previous semester first</span>`;
+    }else if(att){
+      action=`<span class="pill ${att.passed?'green':'red'}">${att.passed?'Passed':'Failed'} · ${att.pct}%</span>
+        <button class="btn btn-ghost btn-sm" onclick="viewSemMarksheet('${c.id}','${sem.id}')">📋 Marksheet</button>
+        ${!att.passed?`<button class="btn btn-sm" onclick="startSemQuiz('${c.id}','${sem.id}')">↻ Retake</button>`:''}`;
+    }else if(sp.pct===100){
+      action=`<button class="btn btn-gold btn-sm" onclick="startSemQuiz('${c.id}','${sem.id}')">Take ${esc(sem.name)} Assessment →</button>`;
+    }else{
+      action=`<span style="font-size:12px;color:var(--muted)">Complete all lessons to unlock assessment (${sp.done}/${sp.total})</span>`;
+    }
+    return `<div class="card" style="margin-bottom:18px;${unlocked?'':'opacity:.85'}">
+      <div class="card-h" style="background:${att?.passed?'#eef7f0':'var(--jgu-light)'}">
+        <span>${esc(sem.name)} ${att?.passed?'✓':''}</span>
+        <span style="font-size:12px;font-weight:600;color:var(--muted)">${sp.pct}% · ${sem.assessment.questions.length} MCQs</span>
+      </div>
+      <div class="card-b">
+        <div class="progress-bar" style="margin-bottom:12px"><i style="width:${sp.pct}%"></i></div>
+        ${mods}
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">${action}</div>
+      </div></div>`;
+  }).join('');
+
+  const allPassed=allSemestersPassed(s.id,c);
+  const finalBtn = allPassed
+    ? `<button class="btn btn-gold" style="width:100%" onclick="go('certificate')">🎓 View Final Certificate →</button>`
+    : `<button class="btn" style="width:100%" disabled>Complete all semesters to earn certificate</button>`;
+  const passedCount=sems.filter(sem=>getSemAttempt(s.id,c.id,sem.id)?.passed).length;
+
+  app().innerHTML=topbar()+`<div class="app-shell">
+    <div class="crumb"><a onclick="go('dashboard')">Dashboard</a> / ${esc(c.title)}</div>
+    <div class="page-head"><h1>${esc(c.title)}</h1></div>
+    <div class="two-col"><div>
+      <div class="card" style="margin-bottom:22px"><div class="card-b"><p style="color:#334">${esc(c.desc)}</p></div></div>
+      <h3 style="color:var(--jgu-navy);margin-bottom:14px">Semesters</h3>${semBlocks}
+    </div><div><div class="side-card">
+      <h4>Programme Progress</h4>
+      <div style="text-align:center;font-size:26px;font-weight:700;color:var(--jgu-navy);margin-bottom:6px">${passedCount}/${sems.length}</div>
+      <div style="text-align:center;font-size:12px;color:var(--muted);margin-bottom:14px">semesters passed</div>
+      <div class="side-stat"><span>Duration</span><b>${esc(c.duration)}</b></div>
+      <div class="side-stat"><span>Credits</span><b>${c.credits}</b></div>
+      <div class="side-stat"><span>Semesters</span><b>${sems.length}</b></div>
+      <div class="side-stat"><span>Total Lessons</span><b>${lessonCount(c)}</b></div>
+      <div style="margin-top:16px">${finalBtn}</div>
+    </div></div></div></div>`;
+}
+
+/* ---------- LESSON (real video) ---------- */
+function openLesson(lid){ S.lessonId=lid; go('lesson'); }
+function videoEmbed(l){
+  if(!l.video) return `<div class="video-ph"><div class="play-btn">▶</div><div style="font-size:13px;opacity:.7">${l.type==='video'?'Lecture Video':'Reading Material'} · ${l.mins} min</div><div style="font-size:11px;opacity:.5">No video uploaded yet — admin can add one</div></div>`;
+  const v=l.video.trim();
+  const yt=v.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
+  if(yt) return `<div class="vwrap"><iframe src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe></div>`;
+  const vm=v.match(/vimeo\.com\/(\d+)/);
+  if(vm) return `<div class="vwrap"><iframe src="https://player.vimeo.com/video/${vm[1]}" allowfullscreen></iframe></div>`;
+  return `<div class="vwrap"><video src="${esc(v)}" controls></video></div>`;
+}
+function renderLesson(){
+  const s=S.user, c=findCourse(S.courseId), all=flatLessons(c);
+  const idx=all.findIndex(l=>l.id===S.lessonId), l=all[idx];
+  const paras=esc(l.body).split('\n\n').map(p=>`<p>${p}</p>`).join('');
+  const prev=idx>0?all[idx-1]:null, next=idx<all.length-1?all[idx+1]:null;
+  const done=getProgress(s.id,c.id).done;
+  app().innerHTML=topbar()+`<div class="app-shell">
+    <div class="crumb"><a onclick="go('dashboard')">Dashboard</a> / <a onclick="openCourse('${c.id}')">${esc(c.title)}</a> / ${esc(l.title)}</div>
+    <div class="two-col"><div class="viewer">
+      ${videoEmbed(l)}
+      <div class="lesson-body"><h2>${esc(l.title)}</h2>${paras}</div>
+      <div class="lesson-nav">
+        ${prev?`<button class="btn btn-ghost" onclick="openLesson('${prev.id}')">← Previous</button>`:`<span></span>`}
+        <button class="btn btn-gold" onclick="completeLesson('${l.id}')">Mark Complete &amp; Continue ✓</button>
+      </div>
+    </div><div><div class="side-card"><h4>Lessons</h4>
+      ${all.map((x,i)=>{const d=done.includes(x.id);return `<div class="side-stat" style="cursor:pointer;${x.id===l.id?'font-weight:700;color:var(--jgu-navy)':''}" onclick="openLesson('${x.id}')"><span>${d?'✓':(i+1)+'.'} ${esc(x.title).slice(0,24)}${x.title.length>24?'…':''}</span></div>`;}).join('')}
+    </div></div></div></div>`;
+}
+function completeLesson(lid){
+  const s=S.user, c=findCourse(S.courseId);
+  setLessonDone(s.id,c.id,lid);
+  // find which semester this lesson belongs to, advance within it
+  const sems=courseSemesters(c);
+  let semOf=null, semLes=null, li=-1;
+  for(const sem of sems){ const ls=semLessons(sem); const k=ls.findIndex(l=>l.id===lid); if(k>=0){ semOf=sem; semLes=ls; li=k; break; } }
+  if(semOf && li<semLes.length-1){ openLesson(semLes[li+1].id); toast('Lesson completed ✓'); }
+  else { const sp=semProgress(s.id,c,semOf); if(sp.pct===100) toast('🎉 Semester lessons done! Assessment unlocked.'); openCourse(c.id); }
+}
+</script>
+<script>
+/* ============================================================
+   QUIZ ENGINE + RESULT + MARKSHEET + CERTIFICATE
+   ============================================================ */
+function startSemQuiz(cid,semId){
+  const c=findCourse(cid), sem=findSemester(c,semId);
+  S.courseId=cid;
+  S.quiz={cid,semId,answers:{},idx:0,timeLeft:sem.assessment.durationMins*60,timerId:null};
+  go('quiz'); startTimer();
+}
+function quizSemester(){ const c=findCourse(S.quiz.cid); return findSemester(c,S.quiz.semId); }
+function startTimer(){
+  const q=S.quiz; clearInterval(q.timerId);
+  q.timerId=setInterval(()=>{
+    q.timeLeft--;
+    const el=document.getElementById('timer-val');
+    if(el){ el.textContent=fmtTime(q.timeLeft); if(q.timeLeft<=60) document.getElementById('timer-box').classList.add('warn'); }
+    if(q.timeLeft<=0){ clearInterval(q.timerId); toast('⏰ Time up — submitting'); submitQuiz(); }
+  },1000);
+}
+function fmtTime(s){ const m=Math.floor(s/60),ss=s%60; return `${m}:${ss<10?'0':''}${ss}`; }
+function renderQuiz(){
+  const c=findCourse(S.quiz.cid), sem=quizSemester(), A=sem.assessment, q=S.quiz, qn=A.questions[q.idx];
+  const opts=qn.opts.map((o,i)=>{const sel=q.answers[q.idx]===i;return `<div class="opt ${sel?'sel':''}" onclick="pick(${q.idx},${i})"><div class="radio"></div><div class="ol">${String.fromCharCode(65+i)}</div><div>${esc(o)}</div></div>`;}).join('');
+  const palette=A.questions.map((_,i)=>`<button class="${q.answers[i]!==undefined?'answered':''} ${i===q.idx?'current':''}" onclick="jump(${i})">${i+1}</button>`).join('');
+  const answered=Object.keys(q.answers).length;
+  app().innerHTML=topbar()+`<div class="app-shell">
+    <div class="quiz-head"><div><h1>${esc(sem.name)} — ${esc(A.title)}</h1><div class="qmeta">${esc(c.title)} · ${A.questions.length} questions · Pass ${A.passMark}%</div></div>
+      <div class="timer" id="timer-box"><div class="t" id="timer-val">${fmtTime(q.timeLeft)}</div><div class="l">TIME REMAINING</div></div></div>
+    <div class="q-card"><div class="q-num">QUESTION ${q.idx+1} OF ${A.questions.length}</div><div class="q-text">${esc(qn.q)}</div>${opts}</div>
+    <div class="quiz-foot"><div><div style="font-size:12px;color:var(--muted);margin-bottom:6px">${answered}/${A.questions.length} answered</div><div class="q-palette">${palette}</div></div>
+      <div style="display:flex;gap:10px">
+        ${q.idx>0?`<button class="btn btn-ghost" onclick="jump(${q.idx-1})">← Prev</button>`:''}
+        ${q.idx<A.questions.length-1?`<button class="btn" onclick="jump(${q.idx+1})">Next →</button>`:`<button class="btn btn-gold" onclick="confirmSubmit()">Submit ✓</button>`}
+      </div></div></div>`;
+}
+function pick(qi,oi){ S.quiz.answers[qi]=oi; render(); }
+function jump(i){ S.quiz.idx=i; render(); }
+function confirmSubmit(){
+  const A=quizSemester().assessment;
+  const un=A.questions.length-Object.keys(S.quiz.answers).length;
+  if(un>0 && !confirm(un+' question(s) unanswered. Submit anyway?')) return;
+  submitQuiz();
+}
+function submitQuiz(){
+  const q=S.quiz; clearInterval(q.timerId);
+  const s=S.user, c=findCourse(q.cid), sem=findSemester(c,q.semId), A=sem.assessment;
+  let correct=0, scored=0, maxMarks=0;
+  A.questions.forEach((qn,i)=>{
+    const m=qn.marks!=null?qn.marks:1, neg=qn.neg!=null?qn.neg:0;
+    maxMarks+=m;
+    if(q.answers[i]===qn.correct){ correct++; scored+=m; }
+    else if(q.answers[i]!=null){ scored-=neg; }
+  });
+  if(scored<0) scored=0;
+  const total=A.questions.length;
+  const pct=maxMarks?Math.round(scored/maxMarks*100):0;
+  const passed=pct>=A.passMark, g=gradeFor(pct);
+  // mark this semester's lessons done
+  semLessons(sem).forEach(l=>setLessonDone(s.id,c.id,l.id));
+  saveSemAttempt(s.id,c.id,q.semId,{semId:q.semId,semName:sem.name,correct,total,scored,maxMarks,pct,passed,grade:g.g,gradeLabel:g.label,gradeColor:g.color,certId:certId(),date:today(),answers:{...q.answers}});
+  S.resultSemId=q.semId;
+  go('result');
+}
+function renderResult(){
+  const s=S.user, c=findCourse(S.courseId);
+  const semId=S.resultSemId, sem=findSemester(c,semId);
+  const a=getSemAttempt(s.id,c.id,semId);
+  const allDone=allSemestersPassed(s.id,c);
+  app().innerHTML=topbar()+`<div class="app-shell">
+    <div class="result-hero"><div class="badge ${a.passed?'pass':'fail'}">${a.passed?'✓':'✕'}</div>
+      <h1>${a.passed?'Congratulations! You Passed '+esc(sem.name):esc(sem.name)+' Not Cleared'}</h1>
+      <div class="score-big">${a.pct}%</div>
+      <div style="color:var(--muted)">${a.correct} of ${a.total} correct · ${a.scored!=null?a.scored+' / '+a.maxMarks+' marks · ':''}Grade ${a.grade} (${a.gradeLabel})</div>
+      <div class="result-stats">
+        <div class="rs"><div class="n">${a.correct}</div><div class="l">Correct</div></div>
+        <div class="rs"><div class="n">${a.total-a.correct}</div><div class="l">Incorrect</div></div>
+        <div class="rs"><div class="n">${a.scored!=null?a.scored+'/'+a.maxMarks:a.pct+'%'}</div><div class="l">Marks</div></div>
+        <div class="rs"><div class="n" style="color:${a.gradeColor}">${a.grade}</div><div class="l">Grade</div></div>
+      </div></div>
+    <div class="action-bar">
+      <button class="btn btn-ghost" onclick="viewSemMarksheet('${c.id}','${semId}')">📋 ${esc(sem.name)} Marksheet</button>
+      ${a.passed
+        ? (allDone
+            ? `<button class="btn btn-gold" onclick="go('certificate')">🎓 Get Final Certificate</button>`
+            : `<button class="btn btn-gold" onclick="openCourse('${c.id}')">Continue to Next Semester →</button>`)
+        : `<button class="btn" onclick="retakeSem('${c.id}','${semId}')">↻ Retake ${esc(sem.name)}</button>`}
+      <button class="btn btn-ghost" onclick="openCourse('${c.id}')">← Course</button>
+    </div></div>`;
+}
+function retakeSem(cid,semId){ if(DB.attempts[S.user.id]) delete DB.attempts[S.user.id][attKey(cid,semId)]; saveDB(); startSemQuiz(cid,semId); }
+function viewSemMarksheet(cid,semId){ S.courseId=cid; S.resultSemId=semId; go('marksheet'); }
+
+function renderMarksheet(){
+  const s=S.user, c=findCourse(S.courseId);
+  const semId=S.resultSemId, sem=findSemester(c,semId);
+  const a=getSemAttempt(s.id,c.id,semId), A=sem.assessment;
+  const gs=DB.settings.gradeScale;
+  let remaining=a.correct;
+  const mods=sem.modules||[];
+  const rows=mods.map((m,i)=>{
+    const isLast=i===mods.length-1;
+    const max=Math.max(1,Math.round(A.questions.length/Math.max(1,mods.length)));
+    let got=isLast?remaining:Math.min(max,Math.round(a.correct*(max/Math.max(1,A.questions.length))));
+    remaining-=got; if(remaining<0)remaining=0;
+    const pct=Math.round(got/max*100), g=gradeFor(pct);
+    return `<tr><td>${esc(m.name)}</td><td style="text-align:center">${max}</td><td style="text-align:center">${got}</td><td style="text-align:center">${pct}%</td><td style="text-align:center"><span class="grade-pill" style="background:${g.color}">${g.g}</span></td></tr>`;
+  }).join('') || `<tr><td colspan="5" style="text-align:center;color:var(--muted)">Assessment score shown in total below</td></tr>`;
+  app().innerHTML=topbar()+`<div class="app-shell">
+    <div class="action-bar no-print"><button class="btn btn-gold" onclick="window.print()">🖨 Print / Save PDF</button><button class="btn btn-ghost" onclick="openCourse('${c.id}')">← Course</button></div>
+    <div class="sheet">
+      <div class="sheet-head"><img src="${LOGO}"><div class="sh-txt"><h2>${esc(DB.settings.universityName)}</h2><p>${esc(DB.settings.universitySub)} · Online Learning Division</p></div></div>
+      <div class="sheet-title">STATEMENT OF MARKS — ${esc(sem.name).toUpperCase()}</div>
+      <div class="sheet-body">
+        <div class="info-grid">
+          <div class="r"><span>Student Name</span><b>${esc(s.name)}</b></div>
+          <div class="r"><span>Enrolment No.</span><b>${esc(s.id)}</b></div>
+          <div class="r"><span>Programme</span><b>${esc(c.title)}</b></div>
+          <div class="r"><span>Semester</span><b>${esc(sem.name)}</b></div>
+          <div class="r"><span>Assessment Date</span><b>${a.date}</b></div>
+          <div class="r"><span>Result</span><b style="color:${a.passed?'var(--ok)':'var(--warn)'}">${a.passed?'PASS':'FAIL'}</b></div>
+        </div>
+        <table class="marks"><thead><tr><th>Module / Component</th><th style="text-align:center">Max</th><th style="text-align:center">Obtained</th><th style="text-align:center">%</th><th style="text-align:center">Grade</th></tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr><td>TOTAL</td><td style="text-align:center">${A.questions.length}</td><td style="text-align:center">${a.correct}</td><td style="text-align:center">${a.pct}%</td><td style="text-align:center"><span class="grade-pill" style="background:${a.gradeColor}">${a.grade}</span></td></tr></tfoot></table>
+        <p style="font-size:12px;color:var(--muted);margin-top:16px">Grading: A (≥${gs.A}) · B (${gs.B}–${gs.A-1}) · C (${gs.C}–${gs.B-1}) · D (${gs.D}–${gs.C-1}) · F (below ${gs.D}). Minimum ${A.passMark}% required to pass.</p>
+      </div>
+      <div class="sheet-foot"><div>Generated online on ${a.date}<br>Verification ID: ${a.certId}</div><div class="sign"><div class="line">${esc(DB.settings.sign2)}</div>MiyeeUpskill</div></div>
+    </div></div>`;
+}
+
+function certSignatures(st){
+  const n=st.signCount||3;
+  let out='';
+  for(let i=1;i<=n;i++){
+    const img=st['sigImg'+i], name=st['sign'+i]||'';
+    out+=`<div class="s"><div class="sig-img">${img?`<img src="${img}">`:''}</div><div class="name">${esc(name)}</div></div>`;
+  }
+  return out;
+}
+function finalCertData(sid,c){
+  const sems=courseSemesters(c);
+  const atts=sems.map(sem=>getSemAttempt(sid,c.id,sem.id)).filter(Boolean);
+  const last=atts[atts.length-1];
+  return last?{date:last.date,certId:last.certId}:{date:today(),certId:certId()};
+}
+function renderCertificate(){
+  const s=S.user, c=findCourse(S.courseId), a=finalCertData(s.id,c);
+  const st=DB.settings;
+  const photo = s.photo ? `<img src="${s.photo}">` : 'STUDENT<br>PHOTO';
+  const photoBox = st.showPhoto!==false ? `<div class="cert-photo">${photo}</div>` : '';
+  const govBlock = st.showGovId!==false ? `<div class="cert-idblock">Identification Number (Voter ID card Number / Passport Number / Driving License Number / Any other Govt ID proof Number):<span>${esc(s.govId||'________________________')}</span></div>` : '';
+  const verifyLine = st.showVerify!==false ? `<div class="cert-verify">Certificate ID: ${a.certId} · Issued on ${a.date}${st.verifyUrl?' · Verify at '+esc(st.verifyUrl):''}</div>` : '';
+  app().innerHTML=topbar()+`<div class="app-shell">
+    <div class="demo-note no-print">🔒 <b>Privacy note:</b> This system runs entirely on this device. No student data is transmitted to any external server — all information stays local and under MiyeeUpskill's control.</div>
+    <div class="action-bar no-print"><button class="btn btn-gold" onclick="window.print()">🖨 Print / Download Certificate</button><button class="btn btn-ghost" onclick="openCourse('${c.id}')">← Course</button><button class="btn btn-ghost" onclick="go('dashboard')">Dashboard</button></div>
+    <div class="cert-pages">
+      <div class="cert-page"><div class="cert-inner">
+        <div class="cert-toprow"><div class="cert-logobox"><img src="${CERT_LOGO}"></div>${photoBox}</div>
+        <div class="cert-body">
+          <p>This is to certify that on successful completion of the requisite programme of study offered by</p>
+          <div class="cert-uni-name">${esc(st.universityName||'MIYEEUPSKILL')}<br><span style="font-size:12px;font-weight:400;color:#6a7788">${esc(st.universitySub||'')}</span></div>
+          <p>in the school of</p>
+          <div class="cert-field big">${esc(c.school||'')}</div>
+          <p>the certificate for the programme</p>
+          <div class="cert-field big">${esc(c.title)}</div>
+          <p>is hereby awarded to</p>
+          <div class="cert-field big">${esc(s.name)}</div>
+          <p>in recognition of the successful completion of all requirements<br>and assessments of the programme.</p>
+          <div class="cert-witness">Awarded on ${a.date} and issued under the authority of MiyeeUpskill.<br>This certificate may be verified online using the Certificate ID below.</div>
+          <div class="cert-signs">${certSignatures(st)}</div>
+        </div>
+      </div></div>
+      <div class="cert-page"><div class="cert-inner cert-back">
+        <ol>
+          <li>Mode of delivery : <span>Online</span></li>
+          <li>Date of Admission: <span>${esc(s.admitDate||'—')}</span></li>
+          <li>Date of Completion: <span>${a.date}</span></li>
+          <li>Name and address of all Learner Support Centres (only for Open and Distance Learning): <span>Not applicable (Online)</span></li>
+          <li>Name and address of all Examination Centres: <span>Online Proctored Examination</span></li>
+        </ol>
+        ${govBlock}
+        ${verifyLine}
+      </div></div>
+    </div></div>`;
+}
+</script>
+<script>
+/* ============================================================
+   ADMIN CONSOLE — dashboard, courses, students, results, settings
+   ============================================================ */
+function renderAdmin(){
+  const tabs=[["dashboard","Dashboard"],["courses","Course Designer"],["students","Students"],["results","Results & Reports"],["settings","Settings"]];
+  const tabBtns=tabs.map(([k,l])=>`<button class="${S.adminTab===k?'active':''}" onclick="adminTab('${k}')">${l}</button>`).join('');
+  let body="";
+  if(S.adminTab==='dashboard') body=adminDashboard();
+  else if(S.adminTab==='courses') body=adminCourses();
+  else if(S.adminTab==='students') body=adminStudents();
+  else if(S.adminTab==='results') body=adminResults();
+  else if(S.adminTab==='settings') body=adminSettings();
+  app().innerHTML=topbar()+`<div class="app-shell">
+    <div class="page-head"><div><div class="crumb">Home / Admin Console</div><h1>Administration &amp; Management</h1></div></div>
+    <div class="tabs">${tabBtns}</div>${body}
+  </div>`+(S.modal?renderModal():'');
+}
+function adminTab(t){ S.adminTab=t; render(); }
+
+/* ---------- DASHBOARD ---------- */
+function allAttempts(){
+  const out=[];
+  Object.entries(DB.attempts).forEach(([sid,byKey])=>Object.entries(byKey).forEach(([key,a])=>{
+    const isSem=key.includes('::');
+    const cid=isSem?key.split('::')[0]:key;
+    out.push({sid,cid,semId:isSem?key.split('::')[1]:null,a});
+  }));
+  return out;
+}
+function adminDashboard(){
+  const atts=allAttempts();
+  const certs=atts.filter(x=>x.a.passed).length;
+  const avg=atts.length?Math.round(atts.reduce((s,x)=>s+x.a.pct,0)/atts.length):0;
+  const recent=atts.slice(-6).reverse().map(x=>{
+    const st=findStudent(x.sid), c=findCourse(x.cid);
+    const semName=x.a.semName||'';
+    return `<tr><td>${esc(st?.name||x.sid)}</td><td>${esc(c?.title||x.cid)}${semName?' <span style="font-size:11px;color:var(--muted)">('+esc(semName)+')</span>':''}</td><td style="text-align:center">${x.a.pct}%</td><td style="text-align:center"><span class="pill ${x.a.passed?'green':'red'}">${x.a.passed?'Pass':'Fail'}</span></td><td>${x.a.date}</td></tr>`;
+  }).join('') || `<tr><td colspan="5" class="empty">No assessments taken yet</td></tr>`;
+  return `<div class="stat-row">
+    <div class="stat"><div class="n">${DB.students.length}</div><div class="l">Total Students</div></div>
+    <div class="stat"><div class="n">${DB.courses.length}</div><div class="l">Active Programmes</div></div>
+    <div class="stat"><div class="n">${certs}</div><div class="l">Certificates Issued</div></div>
+    <div class="stat"><div class="n">${avg}%</div><div class="l">Avg. Assessment Score</div></div>
+  </div>
+  <div class="card"><div class="card-h">Recent Assessment Activity</div>
+    <table class="data"><thead><tr><th>Student</th><th>Programme</th><th style="text-align:center">Score</th><th style="text-align:center">Result</th><th>Date</th></tr></thead><tbody>${recent}</tbody></table>
+  </div>`;
+}
+
+/* ---------- COURSE DESIGNER (semester-aware) ---------- */
+function adminCourses(){
+  const rows=DB.courses.map(c=>{
+    const sems=courseSemesters(c);
+    const semRows=sems.map((sem,si)=>`<tr style="background:#fbfcfe">
+      <td style="padding-left:28px">↳ ${esc(sem.name)}</td>
+      <td style="text-align:center">${semLessonCount(sem)} lessons</td>
+      <td style="text-align:center">${sem.assessment.questions.length} MCQs</td>
+      <td style="text-align:center">—</td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" onclick="editSemester('${c.id}','${sem.id}')">Content</button>
+        <button class="btn btn-ghost btn-sm" onclick="editAssessment('${c.id}','${sem.id}')">Assessment</button>
+        ${sems.length>1?`<button class="btn btn-danger btn-sm" onclick="deleteSemester('${c.id}','${sem.id}')">✕</button>`:''}
+      </td></tr>`).join('');
+    return `<tr>
+      <td><b>${esc(c.title)}</b><div style="font-size:11px;color:var(--muted)">${esc(c.school||'')} · ${sems.length} semester(s)</div></td>
+      <td style="text-align:center">${esc(c.duration)}</td>
+      <td style="text-align:center">${lessonCount(c)}</td>
+      <td style="text-align:center">${DB.students.filter(s=>(s.enrolled||[]).includes(c.id)).length}</td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" onclick="editCourse('${c.id}')">Edit Info</button>
+        <button class="btn btn-ghost btn-sm" onclick="addSemester('${c.id}')">+ Semester</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCourse('${c.id}')">Delete</button>
+      </td></tr>${semRows}`;
+  }).join('');
+  return `<div class="mini-toolbar"><h3 style="color:var(--jgu-navy);margin-right:auto">All Programmes</h3><button class="btn btn-gold" onclick="editCourse(null)">+ New Course</button></div>
+  <div class="card"><table class="data"><thead><tr><th>Programme / Semester</th><th style="text-align:center">Duration / Lessons</th><th style="text-align:center">Total Lessons / MCQs</th><th style="text-align:center">Enrolled</th><th style="text-align:right">Actions</th></tr></thead>
+  <tbody>${rows||`<tr><td colspan=5 class=empty>No courses yet</td></tr>`}</tbody></table></div>
+  <p style="font-size:12px;color:var(--muted);margin-top:10px">Each programme has one or more semesters. Students must pass each semester's assessment in order; the final certificate unlocks only after all semesters are passed.</p>`;
+}
+function deleteCourse(id){
+  if(!confirm('Delete this course and all its content? This cannot be undone.')) return;
+  DB.courses=DB.courses.filter(c=>c.id!==id);
+  DB.students.forEach(s=>s.enrolled=(s.enrolled||[]).filter(x=>x!==id));
+  saveDB(); toast('Course deleted'); render();
+}
+function addSemester(cid){
+  const c=findCourse(cid), sems=courseSemesters(c);
+  const n=sems.length+1;
+  c.semesters.push({id:c.id+'_s'+n+'_'+Date.now().toString(36),name:'Semester '+n,modules:[],assessment:{title:'Semester '+n+' Assessment',passMark:(DB.settings.defaultPassMark||50),durationMins:20,questions:[]}});
+  saveDB(); toast('Semester '+n+' added'); render();
+}
+function deleteSemester(cid,semId){
+  const c=findCourse(cid);
+  if(courseSemesters(c).length<=1){ toast('A course needs at least one semester','err'); return; }
+  if(!confirm('Delete this semester and its content?')) return;
+  c.semesters=c.semesters.filter(s=>s.id!==semId);
+  saveDB(); toast('Semester deleted'); render();
+}
+
+/* Course INFO editor (title/school/etc only — semesters edited separately) */
+let edCourse=null;
+function editCourse(id){
+  if(id){ edCourse=JSON.parse(JSON.stringify(findCourse(id))); }
+  else{ const pm=(DB.settings&&DB.settings.defaultPassMark)||50; const cid=uid('c');
+    edCourse={id:cid,title:"",tag:"Semester Program",school:"",duration:"1 Year",credits:12,level:"Postgraduate",desc:"",
+      semesters:[{id:cid+'_s1',name:'Semester 1',modules:[],assessment:{title:'Semester 1 Assessment',passMark:pm,durationMins:20,questions:[]}}]};
+  }
+  S.modal='course'; render();
+}
+function courseModalBody(){
+  const c=edCourse;
+  const semList=courseSemesters(c).map(s=>`<div class="side-stat"><span>${esc(s.name)}</span><b>${semLessonCount(s)} lessons · ${s.assessment.questions.length} MCQs</b></div>`).join('');
+  return `<div class="field"><label>Course Title</label><input id="ec-title" value="${esc(c.title)}"></div>
+  <div class="field row2"><div><label>School / Faculty (shown on certificate)</label><input id="ec-school" value="${esc(c.school)}"></div><div><label>Type / Tag</label><input id="ec-tag" value="${esc(c.tag)}"></div></div>
+  <div class="field row2"><div><label>Duration</label><input id="ec-dur" value="${esc(c.duration)}"></div><div><label>Credits</label><input id="ec-cr" type="number" value="${c.credits}"></div></div>
+  <div class="field"><label>Level</label><input id="ec-lvl" value="${esc(c.level)}"></div>
+  <div class="field"><label>Description</label><textarea id="ec-desc" rows="3">${esc(c.desc)}</textarea></div>
+  <div style="background:var(--jgu-light);border-radius:8px;padding:12px;font-size:13px"><b style="color:var(--jgu-navy)">Semesters</b> (manage content &amp; assessment from the course list after saving)${semList||'<div style="color:var(--muted);margin-top:6px">New course starts with Semester 1.</div>'}</div>`;
+}
+function saveCourseModal(){
+  commitCourseFields();
+  if(!edCourse.title.trim()){ toast('Course title required','err'); return; }
+  const i=DB.courses.findIndex(c=>c.id===edCourse.id);
+  if(i>=0) DB.courses[i]=edCourse; else DB.courses.push(edCourse);
+  saveDB(); S.modal=null; toast('Course saved ✓'); render();
+}
+function commitCourseFields(){
+  const g=id=>{const e=document.getElementById(id);return e?e.value:undefined;};
+  if(document.getElementById('ec-title')){
+    edCourse.title=g('ec-title'); edCourse.school=g('ec-school'); edCourse.tag=g('ec-tag');
+    edCourse.duration=g('ec-dur'); edCourse.credits=parseInt(g('ec-cr'))||0; edCourse.level=g('ec-lvl'); edCourse.desc=g('ec-desc');
+  }
+}
+
+/* SEMESTER CONTENT editor (modules + lessons for one semester) */
+let edSemCid=null, edSem=null;
+function editSemester(cid,semId){
+  edSemCid=cid;
+  edSem=JSON.parse(JSON.stringify(findSemester(findCourse(cid),semId)));
+  S.modal='semester'; render();
+}
+function semesterModalBody(){
+  const sem=edSem;
+  const mods=(sem.modules||[]).map((m,mi)=>{
+    const les=(m.lessons||[]).map((l,li)=>`<div class="les-row">
+      <div class="li"><b>${esc(l.title)||'(untitled)'}</b><span>${l.type} · ${l.mins}min ${l.video?'· 🎬 video set':''}</span></div>
+      <button class="btn btn-ghost btn-sm" onclick="editLesson(${mi},${li})">Edit</button>
+      <button class="btn btn-danger btn-sm" onclick="delLesson(${mi},${li})">✕</button>
+    </div>`).join('');
+    return `<div class="mod-edit"><div class="mod-edit-h">
+      <input value="${esc(m.name)}" onchange="edModName(${mi},this.value)" placeholder="Module name">
+      <button class="btn btn-ghost btn-sm" onclick="addLesson(${mi})">+ Lesson</button>
+      <button class="btn btn-danger btn-sm" onclick="delModule(${mi})">Delete</button>
+    </div>${les||'<div style="padding:12px 16px;color:var(--muted);font-size:13px">No lessons yet</div>'}</div>`;
+  }).join('');
+  return `<div class="field"><label>Semester Name</label><input id="es-semname" value="${esc(sem.name)}"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 10px"><b style="color:var(--jgu-navy)">Modules &amp; Lessons</b><button class="btn btn-ghost btn-sm" onclick="addModule()">+ Add Module</button></div>
+  ${mods||'<div class="empty" style="padding:24px">No modules yet. Add one to begin.</div>'}`;
+}
+function edModName(mi,v){ edSem.modules[mi].name=v; }
+function addModule(){ commitSemName(); edSem.modules.push({id:uid('m'),name:"New Module",lessons:[]}); render(); }
+function delModule(mi){ commitSemName(); edSem.modules.splice(mi,1); render(); }
+function addLesson(mi){ commitSemName(); editLessonData(mi,null); }
+function editLesson(mi,li){ commitSemName(); editLessonData(mi,li); }
+function delLesson(mi,li){ commitSemName(); edSem.modules[mi].lessons.splice(li,1); render(); }
+function commitSemName(){ const e=document.getElementById('es-semname'); if(e) edSem.name=e.value; }
+function saveSemesterModal(){
+  commitSemName();
+  const c=findCourse(edSemCid);
+  const i=c.semesters.findIndex(s=>s.id===edSem.id);
+  if(i>=0) c.semesters[i]=edSem;
+  saveDB(); S.modal=null; toast('Semester content saved ✓'); render();
+}
+let edLesson=null, edLessonPos=null;
+function editLessonData(mi,li){
+  edLessonPos={mi,li};
+  edLesson = li!=null ? JSON.parse(JSON.stringify(edSem.modules[mi].lessons[li]))
+    : {id:uid('l'),title:"",type:"video",mins:15,video:"",body:""};
+  S.modal='lesson'; render();
+}
+function lessonModalBody(){
+  const l=edLesson;
+  return `<div class="field"><label>Lesson Title</label><input id="el-title" value="${esc(l.title)}"></div>
+  <div class="field row2"><div><label>Type</label><select id="el-type"><option value="video" ${l.type==='video'?'selected':''}>Video</option><option value="reading" ${l.type==='reading'?'selected':''}>Reading</option></select></div><div><label>Duration (min)</label><input id="el-mins" type="number" value="${l.mins}"></div></div>
+  <div class="field"><label>Video URL <span style="color:var(--muted);font-weight:400">(YouTube, Vimeo, or direct .mp4 — blank for reading)</span></label><input id="el-video" value="${esc(l.video)}" placeholder="https://youtu.be/..."></div>
+  <div class="field"><label>Lesson Content / Notes</label><textarea id="el-body" rows="5">${esc(l.body)}</textarea></div>
+  <div style="font-size:12px;color:var(--muted);background:var(--jgu-light);padding:10px;border-radius:8px">💡 Paste a YouTube/Vimeo link and it plays inline for students.</div>`;
+}
+function saveLessonModal(){
+  const g=id=>document.getElementById(id).value;
+  edLesson.title=g('el-title'); edLesson.type=g('el-type'); edLesson.mins=parseInt(g('el-mins'))||0;
+  edLesson.video=g('el-video'); edLesson.body=g('el-body');
+  if(!edLesson.title.trim()){ toast('Lesson title required','err'); return; }
+  const {mi,li}=edLessonPos;
+  if(li!=null) edSem.modules[mi].lessons[li]=edLesson;
+  else edSem.modules[mi].lessons.push(edLesson);
+  S.modal='semester'; toast('Lesson saved ✓'); render();
+}
+
+/* ---------- ASSESSMENT BUILDER (semester-scoped) ---------- */
+let edAssess=null, edAssessCid=null, edAssessSemId=null;
+function editAssessment(cid,semId){
+  edAssessCid=cid; edAssessSemId=semId;
+  const sem=findSemester(findCourse(cid),semId);
+  edAssess=JSON.parse(JSON.stringify(sem.assessment));
+  S.modal='assess'; render();
+}
+function assessModalBody(){
+  const A=edAssess;
+  const qs=A.questions.map((qn,qi)=>{
+    const opts=qn.opts.map((o,oi)=>`<div class="opt-edit">
+      <input type="text" value="${esc(o)}" onchange="edOpt(${qi},${oi},this.value)" placeholder="Option ${String.fromCharCode(65+oi)}">
+      <label><input type="radio" name="correct-${qi}" ${qn.correct===oi?'checked':''} onchange="edCorrect(${qi},${oi})"> correct</label>
+    </div>`).join('');
+    return `<div class="q-editor"><div class="qh"><b>Question ${qi+1}</b><button class="btn btn-danger btn-sm" onclick="delQ(${qi})">Delete</button></div>
+      <div class="field"><input type="text" value="${esc(qn.q)}" onchange="edQText(${qi},this.value)" placeholder="Enter question"></div>
+      ${opts}
+      <div style="display:flex;gap:14px;margin-top:8px">
+        <label style="font-size:12px;color:var(--muted)">Marks <input type="number" step="0.5" value="${qn.marks!=null?qn.marks:1}" onchange="edMarks(${qi},this.value)" style="width:64px;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px"></label>
+        <label style="font-size:12px;color:var(--muted)">Negative <input type="number" step="0.25" value="${qn.neg!=null?qn.neg:0}" onchange="edNeg(${qi},this.value)" style="width:64px;padding:5px 8px;border:1.5px solid var(--border);border-radius:6px"></label>
+      </div></div>`;
+  }).join('');
+  const totMarks=A.questions.reduce((s,q)=>s+(q.marks!=null?q.marks:1),0);
+  return `<div class="field row2"><div><label>Assessment Title</label><input id="ea-title" value="${esc(A.title)}"></div><div><label>Duration (min)</label><input id="ea-dur" type="number" value="${A.durationMins}"></div></div>
+  <div class="field"><label>Pass Mark (%)</label><input id="ea-pass" type="number" value="${A.passMark}"></div>
+  <div style="background:var(--jgu-light);border:1px dashed var(--jgu-accent);border-radius:10px;padding:14px;margin-bottom:16px">
+    <div style="font-weight:700;color:var(--jgu-navy);margin-bottom:6px">📥 Bulk Import Questions from CSV</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Format (max 100 rows): <code>Que No, Question, Option 1, Option 2, Option 3, Option 4, Correct Option (a/b/c/d), Marks, Negative Marks</code></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <input type="file" accept=".csv,text/csv" onchange="importCSV(this)" style="font-size:13px">
+      <button class="btn btn-ghost btn-sm" onclick="downloadCSVTemplate()">⬇ Download Template</button>
+    </div>
+    <div id="csv-msg" style="font-size:12.5px;margin-top:8px"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin:16px 0 12px"><b style="color:var(--jgu-navy)">Questions (${A.questions.length}) · Total ${totMarks} marks</b><button class="btn btn-ghost btn-sm" onclick="addQ()">+ Add Question</button></div>
+  ${qs||'<div class="empty" style="padding:24px">No questions yet. Add manually or import a CSV.</div>'}`;
+}
+function commitAssessTop(){const g=id=>document.getElementById(id);if(g('ea-title')){edAssess.title=g('ea-title').value;edAssess.durationMins=parseInt(g('ea-dur').value)||10;edAssess.passMark=parseInt(g('ea-pass').value)||50;}}
+function edQText(qi,v){ edAssess.questions[qi].q=v; }
+function edOpt(qi,oi,v){ edAssess.questions[qi].opts[oi]=v; }
+function edCorrect(qi,oi){ edAssess.questions[qi].correct=oi; }
+function edMarks(qi,v){ edAssess.questions[qi].marks=parseFloat(v)||0; }
+function edNeg(qi,v){ edAssess.questions[qi].neg=parseFloat(v)||0; }
+function addQ(){ commitAssessTop(); const ng=(DB.settings&&DB.settings.defaultNeg)||0; edAssess.questions.push({q:"",opts:["","","",""],correct:0,marks:1,neg:ng}); render(); }
+function delQ(qi){ commitAssessTop(); edAssess.questions.splice(qi,1); render(); }
+function saveAssessModal(){
+  commitAssessTop();
+  const bad=edAssess.questions.findIndex(q=>!q.q.trim()||q.opts.some(o=>!o.trim()));
+  if(bad>=0){ toast('Question '+(bad+1)+' has empty fields','err'); return; }
+  findSemester(findCourse(edAssessCid),edAssessSemId).assessment=edAssess;
+  saveDB(); S.modal=null; toast('Assessment saved ✓'); render();
+}
+/* ---- CSV parser (handles quoted fields, commas, escaped quotes) ---- */
+function parseCSVLine(line){
+  const out=[]; let cur='', inQ=false;
+  for(let i=0;i<line.length;i++){
+    const ch=line[i];
+    if(inQ){
+      if(ch==='"'){ if(line[i+1]==='"'){ cur+='"'; i++; } else inQ=false; }
+      else cur+=ch;
+    }else{
+      if(ch==='"') inQ=true;
+      else if(ch===','){ out.push(cur); cur=''; }
+      else cur+=ch;
+    }
+  }
+  out.push(cur);
+  return out.map(s=>s.trim());
+}
+function importCSV(inp){
+  const f=inp.files[0]; if(!f) return;
+  const msg=document.getElementById('csv-msg');
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      commitAssessTop();
+      let text=e.target.result.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+      let lines=text.split('\n').filter(l=>l.trim()!=='');
+      if(!lines.length){ msg.innerHTML='<span style="color:var(--warn)">Empty file.</span>'; return; }
+      // detect & skip header (if first row's "correct" cell isn't a/b/c/d)
+      const first=parseCSVLine(lines[0]);
+      const looksHeader = !/^[abcd1-4]$/i.test((first[6]||'').trim());
+      if(looksHeader) lines=lines.slice(1);
+      if(lines.length>100){ msg.innerHTML='<span style="color:var(--warn)">Max 100 questions. Found '+lines.length+'. Import stopped.</span>'; return; }
+      const parsed=[]; const errs=[];
+      lines.forEach((ln,idx)=>{
+        const c=parseCSVLine(ln);
+        if(c.length<7){ errs.push('Row '+(idx+1)+': too few columns'); return; }
+        const q=c[1], o1=c[2],o2=c[3],o3=c[4],o4=c[5];
+        let corr=(c[6]||'').toLowerCase();
+        const map={a:0,b:1,c:2,d:3,'1':0,'2':1,'3':2,'4':3};
+        if(!(corr in map)){ errs.push('Row '+(idx+1)+': bad correct option "'+c[6]+'"'); return; }
+        if(!q||!o1||!o2||!o3||!o4){ errs.push('Row '+(idx+1)+': missing question/option'); return; }
+        const marks=c[7]!==undefined&&c[7]!==''?(parseFloat(c[7])||0):1;
+        const neg=c[8]!==undefined&&c[8]!==''?(parseFloat(c[8])||0):0;
+        parsed.push({q,opts:[o1,o2,o3,o4],correct:map[corr],marks,neg});
+      });
+      if(!parsed.length){ msg.innerHTML='<span style="color:var(--warn)">No valid rows. '+errs.slice(0,3).join('; ')+'</span>'; return; }
+      // ask replace or append
+      const replace = edAssess.questions.length===0 ? true : confirm('Import '+parsed.length+' questions.\n\nOK = REPLACE existing '+edAssess.questions.length+' questions\nCancel = ADD to existing');
+      if(replace) edAssess.questions=parsed; else edAssess.questions=edAssess.questions.concat(parsed);
+      const warn = errs.length?' ('+errs.length+' row(s) skipped)':'';
+      toast('Imported '+parsed.length+' questions ✓');
+      render();
+      setTimeout(()=>{const m2=document.getElementById('csv-msg');if(m2)m2.innerHTML='<span style="color:var(--ok)">✓ Imported '+parsed.length+' questions'+warn+'</span>'+(errs.length?'<div style="color:var(--warn);font-size:11px;margin-top:4px">'+errs.slice(0,5).join('<br>')+'</div>':'');},50);
+    }catch(ex){ msg.innerHTML='<span style="color:var(--warn)">Error reading CSV: '+ex.message+'</span>'; }
+  };
+  r.readAsText(f);
+}
+function downloadCSVTemplate(){
+  const rows=[
+    'Que No,Question,Option 1,Option 2,Option 3,Option 4,Correct Option (a/b/c/d),Marks,Negative Marks',
+    '1,"What does FinTech refer to?","A cryptocurrency","Integration of technology into financial services","A regulation","An index",b,1,0.25',
+    '2,"UPI enables what?","Batch settlement","Real-time interoperable payments","Paper trading","Gold standard",b,1,0.25'
+  ];
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'}), url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='MiyeeUpskill_Assessment_Template.csv'; a.click(); URL.revokeObjectURL(url);
+  toast('Template downloaded ✓');
+}
+
+/* ---------- STUDENT MANAGEMENT ---------- */
+let studentSearch="";
+function adminStudents(){
+  const q=studentSearch.toLowerCase();
+  const list=DB.students.filter(s=>!q||s.name.toLowerCase().includes(q)||s.email.toLowerCase().includes(q)||s.id.toLowerCase().includes(q));
+  const rows=list.map(s=>{
+    const enr=(s.enrolled||[]).map(cid=>findCourse(cid)?.title).filter(Boolean);
+    const done=(s.enrolled||[]).filter(cid=>allSemestersPassed(s.id,findCourse(cid))).length;
+    return `<tr>
+      <td><b>${esc(s.id)}</b></td>
+      <td>${esc(s.name)}<div style="font-size:11px;color:var(--muted)">${esc(s.email)}</div></td>
+      <td>${enr.length?enr.map(t=>`<span class="pill blue" style="margin:1px">${esc(t).slice(0,22)}</span>`).join(' '):'<span class="pill gray">None</span>'}</td>
+      <td style="text-align:center">${done}/${enr.length}</td>
+      <td style="text-align:right;white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" onclick="editStudent('${s.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteStudent('${s.id}')">Delete</button>
+      </td></tr>`;
+  }).join('');
+  return `<div class="mini-toolbar">
+    <input class="search-box" placeholder="Search students by name, email or ID…" value="${esc(studentSearch)}" oninput="studentSearch=this.value;renderStudentsOnly()">
+    <button class="btn btn-gold" onclick="editStudent(null)">+ Add Student</button></div>
+  <div class="card" id="students-table"><table class="data"><thead><tr><th>Enrolment ID</th><th>Student</th><th>Enrolled Programmes</th><th style="text-align:center">Certified</th><th style="text-align:right">Actions</th></tr></thead>
+  <tbody>${rows||`<tr><td colspan=5 class=empty>No students found</td></tr>`}</tbody></table></div>`;
+}
+function renderStudentsOnly(){ const el=document.getElementById('students-table'); if(el){ const tmp=document.createElement('div'); tmp.innerHTML=adminStudents(); el.replaceWith(tmp.querySelector('#students-table')); } }
+function deleteStudent(id){
+  if(!confirm('Remove this student and all their records?')) return;
+  DB.students=DB.students.filter(s=>s.id!==id);
+  delete DB.progress[id]; delete DB.attempts[id];
+  saveDB(); toast('Student removed'); render();
+}
+let edStudent=null;
+function editStudent(id){
+  if(id) edStudent=JSON.parse(JSON.stringify(findStudent(id)));
+  else edStudent={id:nextStudentId(),name:"",email:"",pass:"demo1234",phone:"",govId:"",photo:"",admitDate:today(),enrolled:[]};
+  S.modal='student'; render();
+}
+function studentModalBody(){
+  const s=edStudent;
+  const cbs=DB.courses.map(c=>`<label style="display:flex;align-items:center;gap:8px;padding:6px 0;font-size:14px"><input type="checkbox" value="${c.id}" ${(s.enrolled||[]).includes(c.id)?'checked':''} class="enr-cb"> ${esc(c.title)}</label>`).join('');
+  return `<div class="field row2"><div><label>Enrolment ID</label><input id="es-id" value="${esc(s.id)}"></div><div><label>Admission Date</label><input id="es-admit" value="${esc(s.admitDate)}"></div></div>
+  <div class="field"><label>Full Name</label><input id="es-name" value="${esc(s.name)}"></div>
+  <div class="field row2"><div><label>Email (login)</label><input id="es-email" value="${esc(s.email)}"></div><div><label>Password</label><input id="es-pass" value="${esc(s.pass)}"></div></div>
+  <div class="field row2"><div><label>Phone</label><input id="es-phone" value="${esc(s.phone)}"></div><div><label>Govt ID No. (for certificate)</label><input id="es-gov" value="${esc(s.govId)}"></div></div>
+  <div class="field"><label>Student Photo (for certificate)</label><input type="file" accept="image/*" onchange="pickPhoto(this)">${s.photo?`<div style="margin-top:8px"><img src="${s.photo}" style="height:70px;border:1px solid var(--border);border-radius:6px"></div>`:''}</div>
+  <div class="field"><label>Enrol in Programmes</label>${cbs||'<span style="color:var(--muted)">No courses available</span>'}</div>`;
+}
+function pickPhoto(inp){
+  const f=inp.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{ edStudent.photo=e.target.result; commitStudentFields(); render(); };
+  r.readAsDataURL(f);
+}
+function commitStudentFields(){
+  const g=id=>{const e=document.getElementById(id);return e?e.value:undefined;};
+  if(document.getElementById('es-name')){
+    edStudent.id=g('es-id'); edStudent.admitDate=g('es-admit'); edStudent.name=g('es-name');
+    edStudent.email=g('es-email'); edStudent.pass=g('es-pass'); edStudent.phone=g('es-phone'); edStudent.govId=g('es-gov');
+    edStudent.enrolled=[...document.querySelectorAll('.enr-cb:checked')].map(cb=>cb.value);
+  }
+}
+function saveStudentModal(){
+  commitStudentFields();
+  if(!edStudent.name.trim()||!edStudent.email.trim()){ toast('Name and email required','err'); return; }
+  const dup=DB.students.find(s=>s.email.toLowerCase()===edStudent.email.toLowerCase()&&s.id!==edStudent.id);
+  if(dup){ toast('Email already in use','err'); return; }
+  const i=DB.students.findIndex(s=>s.id===edStudent.id);
+  if(i>=0) DB.students[i]=edStudent; else DB.students.push(edStudent);
+  saveDB(); S.modal=null; toast('Student saved ✓'); render();
+}
+
+/* ---------- RESULTS & REPORTS ---------- */
+function adminResults(){
+  const atts=allAttempts();
+  const rows=atts.map(x=>{
+    const s=findStudent(x.sid), c=findCourse(x.cid), a=x.a;
+    return `<tr><td><b>${esc(s?.id||x.sid)}</b></td><td>${esc(s?.name||'—')}</td><td>${esc(c?.title||x.cid)}</td><td>${esc(a.semName||'—')}</td>
+      <td style="text-align:center">${a.correct}/${a.total}</td><td style="text-align:center">${a.pct}%</td>
+      <td style="text-align:center"><span class="grade-pill" style="background:${a.gradeColor}">${a.grade}</span></td>
+      <td style="text-align:center"><span class="pill ${a.passed?'green':'red'}">${a.passed?'Pass':'Fail'}</span></td>
+      <td>${a.date}</td></tr>`;
+  }).join('');
+  return `<div class="mini-toolbar"><h3 style="color:var(--jgu-navy);margin-right:auto">All Assessment Results (per semester)</h3><button class="btn btn-ghost" onclick="exportCSV()">⬇ Export CSV</button></div>
+  <div class="card"><table class="data"><thead><tr><th>Enrol ID</th><th>Student</th><th>Programme</th><th>Semester</th><th style="text-align:center">Score</th><th style="text-align:center">%</th><th style="text-align:center">Grade</th><th style="text-align:center">Result</th><th>Date</th></tr></thead>
+  <tbody>${rows||`<tr><td colspan=9 class=empty>No results yet</td></tr>`}</tbody></table></div>`;
+}
+function exportCSV(){
+  const atts=allAttempts();
+  if(!atts.length){ toast('No results to export','err'); return; }
+  let csv="Enrolment ID,Student Name,Email,Programme,Semester,Correct,Total,Percentage,Grade,Result,Date\n";
+  atts.forEach(x=>{
+    const s=findStudent(x.sid), c=findCourse(x.cid), a=x.a;
+    csv+=[s?.id||x.sid,s?.name||'',s?.email||'',c?.title||'',a.semName||'',a.correct,a.total,a.pct+'%',a.grade,a.passed?'Pass':'Fail',a.date].map(v=>`"${(v+'').replace(/"/g,'""')}"`).join(',')+"\n";
+  });
+  const blob=new Blob([csv],{type:'text/csv'}), url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='MiyeeUpskill_Results_'+Date.now()+'.csv'; a.click();
+  URL.revokeObjectURL(url); toast('CSV exported ✓');
+}
+
+/* ---------- SETTINGS (comprehensive hub) ---------- */
+let settingsTab='institution';
+function setSettingsTab(t){ settingsTab=t; render(); }
+function adminSettings(){
+  const s=DB.settings;
+  const sub=[["institution","Institution & Certificate"],["grading","Grading & Assessment"],["admins","Admin Accounts"],["data","Data & Storage"]];
+  const subBtns=sub.map(([k,l])=>`<button class="${settingsTab===k?'active':''}" onclick="setSettingsTab('${k}')" style="font-size:13px">${l}</button>`).join('');
+  let body="";
+  if(settingsTab==='institution') body=settingsInstitution();
+  else if(settingsTab==='grading') body=settingsGrading();
+  else if(settingsTab==='admins') body=settingsAdmins();
+  else if(settingsTab==='data') body=settingsData();
+  return `<div class="tabs" style="margin-bottom:18px">${subBtns}</div>${body}`;
+}
+
+function settingsInstitution(){
+  const s=DB.settings;
+  const chk=(v)=>v?'checked':'';
+  const sigSlot=(n)=>{
+    const img=s['sigImg'+n];
+    return `<div style="border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;${s.signCount<n?'opacity:.4':''}">
+      <div style="font-size:12px;font-weight:600;color:var(--jgu-navy);margin-bottom:8px">Signature ${n}: ${esc(s['sign'+n]||'')}</div>
+      <div style="height:56px;display:flex;align-items:center;justify-content:center;background:var(--jgu-light);border-radius:6px;margin-bottom:8px">${img?`<img src="${img}" style="max-height:52px;max-width:100%">`:'<span style="font-size:11px;color:var(--muted)">No image</span>'}</div>
+      <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0">Upload<input type="file" accept="image/*" onchange="uploadSig(${n},this)" style="display:none"></label>
+      ${img?`<button class="btn btn-danger btn-sm" onclick="clearSig(${n})">Remove</button>`:''}
+    </div>`;
+  };
+  return `<div class="card" style="max-width:680px"><div class="card-h">Institution & Certificate Details</div><div class="card-b">
+    <div class="field"><label>University Name</label><input id="set-uni" value="${esc(s.universityName)}"></div>
+    <div class="field"><label>Subtitle</label><input id="set-sub" value="${esc(s.universitySub)}"></div>
+    <div class="field row2"><div><label>Signatory 1 (left)</label><input id="set-s1" value="${esc(s.sign1)}"></div><div><label>Signatory 2 (centre)</label><input id="set-s2" value="${esc(s.sign2)}"></div></div>
+    <div class="field row2"><div><label>Signatory 3 (right)</label><input id="set-s3" value="${esc(s.sign3)}"></div><div><label>Certificate ID Prefix</label><input id="set-prefix" value="${esc(s.certPrefix)}"></div></div>
+    <div class="field"><label>Certificate Verification URL</label><input id="set-verify" value="${esc(s.verifyUrl)}"></div>
+    <div style="border-top:1px solid var(--border);margin:16px 0;padding-top:14px"><b style="color:var(--jgu-navy);font-size:14px">Signatures on Certificate</b></div>
+    <div class="field"><label>Number of signatures</label><select id="set-signcount" onchange="changeSignCount(this.value)"><option value="2" ${s.signCount==2?'selected':''}>2 signatures</option><option value="3" ${s.signCount==3?'selected':''}>3 signatures</option></select></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:8px">${sigSlot(1)}${sigSlot(2)}${sigSlot(3)}</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:8px">Upload signature images (PNG with transparent background works best). Edit the signatory names above and click Save to update the labels.</p>
+    <div style="border-top:1px solid var(--border);margin:16px 0;padding-top:14px"><b style="color:var(--jgu-navy);font-size:14px">Certificate Display Options</b></div>
+    <label style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px"><input type="checkbox" id="set-photo" ${chk(s.showPhoto)}> Show student photo box on certificate</label>
+    <label style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px"><input type="checkbox" id="set-gov" ${chk(s.showGovId)}> Show Government ID number on certificate</label>
+    <label style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px"><input type="checkbox" id="set-vshow" ${chk(s.showVerify)}> Show verification URL / certificate ID line</label>
+    <div style="border-top:1px solid var(--border);margin:16px 0;padding-top:14px"><b style="color:var(--jgu-navy);font-size:14px">Student Access</b></div>
+    <label style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:14px"><input type="checkbox" id="set-signup" ${chk(s.allowSignup)}> Allow students to self-register (create their own accounts)</label>
+    <p style="font-size:12px;color:var(--muted)">When off, only administrators can create student accounts and the "Create an account" link is hidden.</p>
+    <div style="margin-top:16px"><button class="btn btn-gold" onclick="saveSettingsInstitution()">Save Changes</button></div>
+  </div></div>`;
+}
+function changeSignCount(v){ commitInstFields(); DB.settings.signCount=parseInt(v)||3; render(); }
+function uploadSig(n,inp){
+  const f=inp.files[0]; if(!f) return;
+  if(f.size>500*1024){ toast('Signature image too large (max 500 KB)','err'); return; }
+  const r=new FileReader();
+  r.onload=e=>{ commitInstFields(); DB.settings['sigImg'+n]=e.target.result; if(saveDB()) toast('Signature '+n+' uploaded ✓'); render(); };
+  r.readAsDataURL(f);
+}
+function clearSig(n){ DB.settings['sigImg'+n]=""; saveDB(); toast('Signature '+n+' removed'); render(); }
+function commitInstFields(){
+  const g=id=>{const e=document.getElementById(id);return e?e.value:undefined;};
+  const c=id=>{const e=document.getElementById(id);return e?e.checked:undefined;};
+  if(document.getElementById('set-uni')){
+    Object.assign(DB.settings,{
+      universityName:g('set-uni'),universitySub:g('set-sub'),
+      sign1:g('set-s1'),sign2:g('set-s2'),sign3:g('set-s3'),
+      certPrefix:g('set-prefix')||'MU',verifyUrl:g('set-verify'),
+      showPhoto:c('set-photo'),showGovId:c('set-gov'),showVerify:c('set-vshow'),allowSignup:c('set-signup')
+    });
+  }
+}
+function saveSettingsInstitution(){
+  commitInstFields();
+  if(saveDB()) toast('Institution settings saved ✓');
+  render();
+}
+
+function settingsGrading(){
+  const s=DB.settings, gs=s.gradeScale;
+  return `<div class="card" style="max-width:680px"><div class="card-h">Grading Scale (minimum % for each grade)</div><div class="card-b">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Set the minimum percentage required for each grade. Anything below the D threshold is an F (Fail). Thresholds must decrease from A to D.</p>
+    <div class="field" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+      <div><label>Grade A ≥</label><input id="gs-a" type="number" value="${gs.A}"></div>
+      <div><label>Grade B ≥</label><input id="gs-b" type="number" value="${gs.B}"></div>
+      <div><label>Grade C ≥</label><input id="gs-c" type="number" value="${gs.C}"></div>
+      <div><label>Grade D ≥</label><input id="gs-d" type="number" value="${gs.D}"></div>
+    </div>
+    <div style="background:var(--jgu-light);border-radius:8px;padding:12px;font-size:13px;color:var(--muted);margin-bottom:16px">
+      Preview: A ≥ ${gs.A}% · B ${gs.B}–${gs.A-1}% · C ${gs.C}–${gs.B-1}% · D ${gs.D}–${gs.C-1}% · F below ${gs.D}%
+    </div>
+    <div style="border-top:1px solid var(--border);margin:4px 0 14px;padding-top:14px"><b style="color:var(--jgu-navy);font-size:14px">Assessment Defaults</b></div>
+    <div class="field row2"><div><label>Default Pass Mark (%)</label><input id="gs-pass" type="number" value="${s.defaultPassMark}"></div><div><label>Default Negative Marking (per wrong answer)</label><input id="gs-neg" type="number" step="0.25" value="${s.defaultNeg}"></div></div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">These defaults apply to newly created assessments and questions. Existing assessments keep their own values.</p>
+    <button class="btn btn-gold" onclick="saveSettingsGrading()">Save Grading Settings</button>
+  </div></div>`;
+}
+function saveSettingsGrading(){
+  const n=id=>parseFloat(document.getElementById(id).value);
+  const A=n('gs-a'),B=n('gs-b'),C=n('gs-c'),D=n('gs-d');
+  if([A,B,C,D].some(v=>isNaN(v)||v<0||v>100)){ toast('Grade thresholds must be 0–100','err'); return; }
+  if(!(A>B && B>C && C>D)){ toast('Thresholds must decrease: A > B > C > D','err'); return; }
+  DB.settings.gradeScale={A,B,C,D};
+  DB.settings.defaultPassMark=Math.max(0,Math.min(100,n('gs-pass')||50));
+  DB.settings.defaultNeg=Math.max(0,n('gs-neg')||0);
+  if(saveDB()) toast('Grading settings saved ✓');
+  render();
+}
+
+function settingsAdmins(){
+  const rows=DB.admins.map((a,i)=>`<tr>
+    <td>${esc(a.name)}</td><td>${esc(a.email)}</td>
+    <td style="text-align:right;white-space:nowrap">
+      <button class="btn btn-ghost btn-sm" onclick="editAdmin(${i})">Edit</button>
+      ${DB.admins.length>1?`<button class="btn btn-danger btn-sm" onclick="deleteAdmin(${i})">Delete</button>`:'<span style="font-size:11px;color:var(--muted)">last admin</span>'}
+    </td></tr>`).join('');
+  return `<div class="mini-toolbar"><h3 style="color:var(--jgu-navy);margin-right:auto">Administrator Accounts</h3><button class="btn btn-gold" onclick="editAdmin(null)">+ Add Admin</button></div>
+  <div class="card" style="max-width:680px"><table class="data"><thead><tr><th>Name</th><th>Email (login)</th><th style="text-align:right">Actions</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p style="font-size:12px;color:var(--muted);margin-top:12px;max-width:680px">⚠ Passwords are stored locally in plain text in this offline build. In the cloud/production version, passwords will be securely hashed. Do not reuse important passwords here.</p>`;
+}
+let edAdmin=null, edAdminIdx=null;
+function editAdmin(i){
+  edAdminIdx=i;
+  edAdmin = i!=null ? {...DB.admins[i]} : {name:"",email:"",pass:""};
+  S.modal='admin'; render();
+}
+function adminModalBody(){
+  const a=edAdmin;
+  return `<div class="field"><label>Name</label><input id="ad-name" value="${esc(a.name)}"></div>
+  <div class="field"><label>Email (login)</label><input id="ad-email" value="${esc(a.email)}"></div>
+  <div class="field"><label>Password</label><input id="ad-pass" value="${esc(a.pass)}" placeholder="Set a password"></div>`;
+}
+function saveAdminModal(){
+  const g=id=>document.getElementById(id).value.trim();
+  const name=g('ad-name'),email=g('ad-email'),pass=g('ad-pass');
+  if(!name||!email||!pass){ toast('All fields required','err'); return; }
+  const dup=DB.admins.find((x,idx)=>x.email.toLowerCase()===email.toLowerCase()&&idx!==edAdminIdx);
+  if(dup){ toast('Email already used by another admin','err'); return; }
+  if(edAdminIdx!=null) DB.admins[edAdminIdx]={name,email,pass};
+  else DB.admins.push({name,email,pass});
+  if(saveDB()){ S.modal=null; toast('Admin saved ✓'); }
+  render();
+}
+function deleteAdmin(i){
+  if(DB.admins.length<=1){ toast('Cannot delete the last admin','err'); return; }
+  if(!confirm('Delete this administrator account?')) return;
+  DB.admins.splice(i,1); saveDB(); toast('Admin deleted'); render();
+}
+
+function settingsData(){
+  const u=storageUsage();
+  const barColor = u.pct>85?'var(--warn)':u.pct>60?'#b7791f':'var(--ok)';
+  const counts=`${DB.courses.length} courses · ${DB.students.length} students · ${allAttempts().length} attempts`;
+  return `<div class="card" style="max-width:680px"><div class="card-h">Storage Usage</div><div class="card-b">
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>${u.kb} KB used of ~${(u.cap/1024/1024).toFixed(0)} MB</span><span style="color:${barColor};font-weight:700">${u.pct}%</span></div>
+    <div class="progress-bar" style="height:12px;margin-bottom:8px"><i style="width:${u.pct}%;background:${barColor}"></i></div>
+    <div style="font-size:12.5px;color:var(--muted)">${counts}</div>
+    ${u.pct>75?`<div style="margin-top:10px;background:#fdf0e8;border:1px solid #f0c9ad;border-radius:8px;padding:10px;font-size:12.5px;color:#8a4b1e">⚠ Storage is filling up. Student photos and any base64 videos take the most space. Export a backup and remove large media if you approach 100%.</div>`:''}
+  </div></div>
+
+  <div class="card" style="max-width:680px;margin-top:20px"><div class="card-h">Backup & Restore</div><div class="card-b">
+    <p style="font-size:13.5px;color:var(--muted);margin-bottom:14px">All data lives on this device only. Use backup to move everything to another computer, or as a safety copy. Restoring <b>replaces</b> all current data.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-ghost" onclick="backupData()">⬇ Backup All Data (JSON)</button>
+      <label class="btn btn-ghost" style="cursor:pointer;margin:0">⬆ Restore from Backup<input type="file" accept=".json,application/json" onchange="restoreData(this)" style="display:none"></label>
+    </div>
+    <div id="restore-msg" style="font-size:12.5px;margin-top:10px"></div>
+  </div></div>
+
+  <div class="card" style="max-width:680px;margin-top:20px"><div class="card-h" style="color:var(--warn)">Danger Zone</div><div class="card-b">
+    <p style="font-size:13.5px;color:var(--muted);margin-bottom:14px">Reset erases all courses, students, and results and restores the original demo data. Export a backup first if unsure.</p>
+    <button class="btn btn-danger" onclick="resetData()">Reset to Demo Data</button>
+  </div></div>`;
+}
+function backupData(){
+  try{
+    const blob=new Blob([JSON.stringify(DB,null,2)],{type:'application/json'}), url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); const stamp=new Date().toISOString().slice(0,10);
+    a.href=url; a.download='MiyeeUpskill_Backup_'+stamp+'.json'; a.click(); URL.revokeObjectURL(url);
+    toast('Backup downloaded ✓');
+  }catch(e){ toast('Backup failed','err'); }
+}
+function restoreData(inp){
+  const f=inp.files[0]; if(!f) return;
+  const msg=document.getElementById('restore-msg');
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const parsed=JSON.parse(e.target.result);
+      const mig=migrateDB(parsed);
+      if(!mig || !Array.isArray(mig.courses) || !Array.isArray(mig.students) || !Array.isArray(mig.admins)){
+        msg.innerHTML='<span style="color:var(--warn)">Invalid backup file — missing core data.</span>'; return;
+      }
+      if(!confirm('Restore this backup? It will REPLACE all current data ('+DB.courses.length+' courses, '+DB.students.length+' students).')) { msg.innerHTML=''; return; }
+      DB=mig;
+      if(saveDB()){ toast('Data restored ✓'); render();
+        setTimeout(()=>{const m2=document.getElementById('restore-msg');if(m2)m2.innerHTML='<span style="color:var(--ok)">✓ Restored '+DB.courses.length+' courses, '+DB.students.length+' students, '+DB.admins.length+' admins</span>';},60);
+      }
+    }catch(ex){ msg.innerHTML='<span style="color:var(--warn)">Could not read file: '+esc(ex.message)+'</span>'; }
+  };
+  r.readAsText(f);
+}
+function resetData(){ if(!confirm('Reset ALL data back to demo defaults? This erases your courses and students.')) return; DB=migrateDB(seedDB()); saveDB(); toast("Reset to demo data"); settingsTab='institution'; render(); }
+
+/* ---------- MODAL RENDERER ---------- */
+function renderModal(){
+  let title="",body="",save="",wide="";
+  if(S.modal==='course'){ title=edCourse.title?'Edit Course Info':'New Course'; body=courseModalBody(); save='saveCourseModal()'; wide='wide'; }
+  else if(S.modal==='semester'){ title='Semester Content — '+esc(edSem.name); body=semesterModalBody(); save='saveSemesterModal()'; wide='wide'; }
+  else if(S.modal==='lesson'){ title='Lesson'; body=lessonModalBody(); save='saveLessonModal()'; }
+  else if(S.modal==='assess'){ title='Assessment Builder'; body=assessModalBody(); save='saveAssessModal()'; wide='wide'; }
+  else if(S.modal==='student'){ title=edStudent.name?'Edit Student':'Add Student'; body=studentModalBody(); save='saveStudentModal()'; }
+  else if(S.modal==='admin'){ title=edAdminIdx!=null?'Edit Admin':'Add Admin'; body=adminModalBody(); save='saveAdminModal()'; }
+  const closeTo = S.modal==='lesson' ? "S.modal='semester';render()" : "S.modal=null;render()";
+  return `<div class="modal-bg" onclick="if(event.target===this){${closeTo}}"><div class="modal ${wide}">
+    <div class="modal-h"><h3>${title}</h3><button class="x" onclick="${closeTo}">×</button></div>
+    <div class="modal-b">${body}</div>
+    <div class="modal-f"><button class="btn btn-ghost" onclick="${closeTo}">Cancel</button><button class="btn btn-gold" onclick="${save}">Save</button></div>
+  </div></div>`;
+}
+
+/* ---------- BOOT ---------- */
+render();
+</script>
+</body></html>
