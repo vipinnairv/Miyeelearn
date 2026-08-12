@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Console - MiyeeUpskill</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div id="root"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script>
+(async ()=>{
+  const ctx = await requireAuth('admin');
+  if(!ctx) return;
+
+  const root = document.getElementById('root');
+  root.innerHTML = topbarHTML(ctx.profile) + `
+    <div class="app-shell">
+      <div class="crumb">Home / Admin Console</div>
+      <div class="page-head"><h1>Administration &amp; Management</h1></div>
+      <div class="card"><div class="card-b">
+        <p style="color:var(--ok);font-weight:600">&#10003; Connected to MiyeeUpskill successfully as an administrator.</p>
+        <p style="margin-top:10px;font-size:13.5px;color:var(--muted)">Signed in as <b>${esc(ctx.session.user.email)}</b><br>Role: <b>${esc(ctx.profile.role)}</b></p>
+        <p style="margin-top:14px;font-size:13.5px">This confirms the connection to Supabase and role-based routing are working. Course Designer, Students, and Worksheets tabs will be added next.</p>
+      </div></div>
+    </div>` + devCreditHTML();
+})();
+</script>
+</body>
+</html>

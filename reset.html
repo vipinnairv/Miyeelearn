@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Set New Password - MiyeeUpskill</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-card" style="max-width:460px">
+    <div class="login-right" style="flex:1">
+      <span class="lg-logo" style="align-self:flex-start;margin-bottom:20px"><img src="assets/logo.svg" style="height:36px"></span>
+      <h2>Set a new password</h2>
+      <div class="sub">Choose a new password for your account.</div>
+      <form id="reset-form">
+        <div class="field"><label>New Password</label><input id="rp-pass" type="password" required minlength="6" placeholder="Min 6 characters"></div>
+        <div class="field"><label>Confirm New Password</label><input id="rp-pass2" type="password" required minlength="6" placeholder="Re-enter password"></div>
+        <button type="submit" class="btn" style="width:100%;padding:12px;font-size:15px">Update Password &rarr;</button>
+      </form>
+      <div id="rp-msg"></div>
+    </div>
+  </div>
+</div>
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script>
+document.getElementById('reset-form').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const msg = document.getElementById('rp-msg');
+  const p1 = document.getElementById('rp-pass').value;
+  const p2 = document.getElementById('rp-pass2').value;
+  if(p1 !== p2){ msg.innerHTML = '<div class="err">Passwords do not match.</div>'; return; }
+
+  const { error } = await sb.auth.updateUser({ password: p1 });
+  if(error){
+    msg.innerHTML = `<div class="err">${esc(error.message)}</div>`;
+    return;
+  }
+  msg.innerHTML = '<div class="ok-msg">Password updated. Redirecting to sign in...</div>';
+  setTimeout(()=>{ window.location.href = 'index.html'; }, 1800);
+});
+</script>
+</body>
+</html>

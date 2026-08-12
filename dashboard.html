@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Courses - MiyeeUpskill</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div id="root"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script>
+(async ()=>{
+  const ctx = await requireAuth(null); // any logged-in user can land here; we redirect admins onward
+  if(!ctx) return;
+  if(ctx.profile.role==='admin' || ctx.profile.role==='mentor'){
+    window.location.href = 'admin.html';
+    return;
+  }
+
+  const root = document.getElementById('root');
+  root.innerHTML = topbarHTML(ctx.profile) + `
+    <div class="app-shell">
+      <div class="crumb">Home / My Dashboard</div>
+      <div class="page-head"><h1>Welcome back, ${esc(ctx.profile.full_name.split(' ')[0])} \ud83d\udc4b</h1></div>
+      <div class="card"><div class="card-b" id="status-box">
+        <p style="color:var(--ok);font-weight:600">&#10003; Connected to MiyeeUpskill successfully.</p>
+        <p style="margin-top:10px;font-size:13.5px;color:var(--muted)">Signed in as <b>${esc(ctx.session.user.email)}</b><br>Role: <b>${esc(ctx.profile.role)}</b><br>Organization ID: <code>${esc(ctx.profile.org_id)}</code></p>
+      </div></div>
+    </div>` + devCreditHTML();
+})();
+</script>
+</body>
+</html>
