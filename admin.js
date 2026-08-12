@@ -664,11 +664,86 @@ async function renderStudentsTab(view){
   }).join('');
 
   view.innerHTML = '<div class="crumb">Home / Admin Console / Students</div>'+
-    '<div class="page-head"><h1>Students</h1></div>'+
+    '<div class="page-head-row"><div><h1>Students</h1></div>'+
+    '<div class="page-head-actions"><button class="btn btn-gold btn-sm" onclick="openCreateAccountModal()">+ New Account</button></div></div>'+
+    '<p style="color:var(--muted);font-size:12.5px;margin:-12px 0 16px">Only founder accounts are listed below. A newly created mentor account can sign in right away but won\'t appear in this table.</p>'+
     '<div class="card"><div style="overflow-x:auto"><table class="admin-table">'+
       '<thead><tr><th>Name</th><th>Enrolled Courses</th><th></th></tr></thead>'+
       '<tbody>'+(rowsHtml || '<tr><td colspan="3" style="color:var(--muted);padding:16px">No founders in this organization yet.</td></tr>')+'</tbody>'+
     '</table></div></div>';
+}
+
+// ---------- account creation (founder / mentor logins) ----------
+
+function generatePassword(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+  let out = '';
+  for(let i=0;i<10;i++) out += chars[Math.floor(Math.random()*chars.length)];
+  return out;
+}
+
+async function createAccountViaFunction(payload){
+  const resp = await fetch(SUPABASE_URL + '/functions/v1/create-user', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + CTX.session.access_token,
+      'apikey': SUPABASE_ANON_KEY
+    },
+    body: JSON.stringify(payload)
+  });
+  const data = await resp.json().catch(()=>({}));
+  if(!resp.ok) throw new Error(data.error || ('Request failed ('+resp.status+')'));
+  return data;
+}
+
+function openCreateAccountModal(){
+  openModal(
+    '<h3>New Account</h3>'+
+    '<form id="acct-form">'+
+      '<div class="field"><label>Full name</label><input id="af-name" required></div>'+
+      '<div class="field"><label>Email</label><input id="af-email" type="email" required></div>'+
+      '<div class="field row2">'+
+        '<div><label>Role</label><select id="af-role"><option value="founder">Founder</option><option value="mentor">Mentor</option></select></div>'+
+        '<div><label>Password</label><div style="display:flex;gap:6px">'+
+          '<input id="af-password" type="text" required minlength="6" placeholder="Min 6 characters" style="flex:1">'+
+          '<button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById(\'af-password\').value=generatePassword()">Generate</button>'+
+        '</div></div>'+
+      '</div>'+
+      '<p style="font-size:12px;color:var(--muted);margin-top:-6px">They sign in with this email and password. It is not emailed automatically, you share it with them directly.</p>'+
+      '<div class="modal-actions"><button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-gold" id="af-submit">Create Account</button></div>'+
+    '</form>'
+  );
+  document.getElementById('acct-form').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const btn = document.getElementById('af-submit');
+    const full_name = document.getElementById('af-name').value.trim();
+    const email = document.getElementById('af-email').value.trim();
+    const role = document.getElementById('af-role').value;
+    const password = document.getElementById('af-password').value;
+    if(!full_name || !email || password.length < 6) return;
+    btn.disabled = true; btn.textContent = 'Creating...';
+    try{
+      await createAccountViaFunction({ full_name, email, role, password });
+      showAccountCreatedModal(full_name, email, role, password);
+    }catch(err){
+      toast('Could not create account: '+err.message, 'err');
+      btn.disabled = false; btn.textContent = 'Create Account';
+    }
+  });
+}
+
+function showAccountCreatedModal(name, email, role, password){
+  openModal(
+    '<h3>Account Created</h3>'+
+    '<p style="font-size:13.5px;margin-bottom:14px">Share these sign-in details with '+esc(name)+'. This password will not be shown again.</p>'+
+    '<div class="card" style="margin-bottom:6px"><div class="card-b">'+
+      '<p style="font-size:13px"><b>Role:</b> '+esc(role)+'</p>'+
+      '<p style="font-size:13px"><b>Email:</b> <code>'+esc(email)+'</code></p>'+
+      '<p style="font-size:13px"><b>Password:</b> <code>'+esc(password)+'</code></p>'+
+    '</div></div>'+
+    '<div class="modal-actions"><button type="button" class="btn btn-gold" onclick="closeModal(); route();">Done</button></div>'
+  );
 }
 
 function openManageEnrolModal(founderId){

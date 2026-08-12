@@ -179,6 +179,8 @@ a{color:var(--blue);cursor:pointer;text-decoration:none}
 .enrol-row{display:flex;align-items:center;gap:10px;padding:8px 4px;font-size:14px;border-bottom:1px solid var(--border)}
 .enrol-row:last-child{border-bottom:none}
 
+code{background:var(--light);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:12.5px;font-family:Consolas,Monaco,monospace}
+
 /* Field builder */
 .fb-row{border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--light)}
 .fb-row-top{display:flex;gap:8px;align-items:center;margin-bottom:8px}
