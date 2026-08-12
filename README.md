@@ -67,6 +67,40 @@ page, always test through a real `http://` address, whether local or live.
 
 (passwords are whatever you set in Supabase Authentication -> Users)
 
+## Deploying the create-user Edge Function
+
+Admins create founder and mentor logins from the Students tab in the
+admin console (`admin.html`). That flow calls a small Supabase Edge
+Function, `supabase/functions/create-user`, which uses your project's
+service_role key server-side, the anon/publishable key in `config.js`
+cannot safely do this on its own. The service_role key never lives in
+this repo, Supabase injects it into the function at runtime.
+
+One-time setup:
+
+1. Install the Supabase CLI if you don't already have it:
+   https://supabase.com/docs/guides/cli
+2. `supabase login`
+3. From the root of this repo, deploy the function, replacing
+   `<project-ref>` with your Supabase project ref (visible in your
+   Supabase dashboard URL, or under Project Settings -> General):
+
+   ```
+   supabase functions deploy create-user --project-ref <project-ref>
+   ```
+
+That's it, no secrets to set manually. `SUPABASE_URL`,
+`SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are provided to
+every Edge Function automatically.
+
+If `supabase/functions/create-user/index.ts` is ever edited, re-run
+the same deploy command to push the update.
+
+To test it: sign in to the admin console, go to Students -> New
+Account, and create a test founder or mentor login. Until the
+function is deployed, that button will fail with a network/404 error,
+everything else in the admin console works independently of it.
+
 ## Developed by
 
 Vipin Nair
