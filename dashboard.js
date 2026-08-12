@@ -43,6 +43,8 @@ function parseHash(){
   const parts = h.split('/').filter(Boolean);
   if(parts[0]==='course' && parts[1]){
     if(parts[2]==='lesson' && parts[3]) return { view:'lesson', courseId:parts[1], lessonId:parts[3] };
+    if(parts[2]==='semester' && parts[3] && parts[4]==='quiz') return { view:'quiz', courseId:parts[1], semesterId:parts[3] };
+    if(parts[2]==='semester' && parts[3] && parts[4]==='attempt' && parts[5]) return { view:'attempt', courseId:parts[1], semesterId:parts[3], attemptId:parts[5] };
     return { view:'course', courseId:parts[1] };
   }
   return { view:'list' };
@@ -57,6 +59,8 @@ async function route(){
     if(r.view==='list') await renderCourseList(view);
     else if(r.view==='course') await renderCourseDetail(view, r.courseId);
     else if(r.view==='lesson') await renderLesson(view, r.courseId, r.lessonId);
+    else if(r.view==='quiz') await renderQuiz(view, r.courseId, r.semesterId);
+    else if(r.view==='attempt') await renderAttemptReview(view, r.courseId, r.semesterId, r.attemptId);
   }catch(err){
     console.error(err);
     view.innerHTML = '<div class="err">Could not load this page. '+esc(err.message||'Unknown error')+'</div>';
@@ -130,13 +134,23 @@ async function renderCourseDetail(view, courseId){
   const subKeys = new Set(Object.keys(subsByKey));
   const viewed = viewedSet();
 
+  const { data: attempts } = await sb.from('assessment_attempts').select('*').eq('course_id', courseId).eq('founder_id', uid);
+  const attemptsBySemester = {};
+  (attempts||[]).forEach(a=>{ (attemptsBySemester[a.semester_id] = attemptsBySemester[a.semester_id] || []).push(a); });
+
   const semHtml = semesters.map((s, si)=>{
+    const semAttempts = (attemptsBySemester[s.id]||[]).slice().sort((a,b)=> new Date(b.submitted_at) - new Date(a.submitted_at));
+    const passedAttempt = semAttempts.find(a=>a.passed);
+
     if(si>0){
-      const prev = semesters[si-1];
-      return '<div class="sem-card locked">'+
-        '<div class="sem-head"><h3>&#128274; '+esc(s.name)+'</h3><span class="pill pill-muted">Locked</span></div>'+
-        '<p class="cc-desc">Complete and pass the assessment for "'+esc(prev.name)+'" to unlock this semester. The semester assessment feature is coming soon.</p>'+
-      '</div>';
+      const prevPassed = (attemptsBySemester[semesters[si-1].id]||[]).some(a=>a.passed);
+      if(!prevPassed){
+        const prev = semesters[si-1];
+        return '<div class="sem-card locked">'+
+          '<div class="sem-head"><h3>&#128274; '+esc(s.name)+'</h3><span class="pill pill-muted">Locked</span></div>'+
+          '<p class="cc-desc">Pass the assessment for "'+esc(prev.name)+'" to unlock this semester.</p>'+
+        '</div>';
+      }
     }
 
     const stats = courseStats([s], subKeys, viewed);
@@ -162,11 +176,24 @@ async function renderCourseDetail(view, courseId){
       return '<div class="module-block"><div class="module-title">'+esc(m.name)+'</div>'+lessonsHtml+'</div>';
     }).join('');
 
+    let assessActions;
+    if(passedAttempt){
+      assessActions = '<span class="pill pill-ok">Passed '+Math.round(passedAttempt.percentage)+'%</span>'+
+        '<button class="btn btn-ghost btn-sm" onclick="location.hash=\'#/course/'+courseId+'/semester/'+s.id+'/attempt/'+passedAttempt.id+'\'">View Result</button>';
+    }else if(semAttempts.length){
+      const latest = semAttempts[0];
+      assessActions = '<span class="pill pill-warn">Failed '+Math.round(latest.percentage)+'%</span>'+
+        '<button class="btn btn-ghost btn-sm" onclick="location.hash=\'#/course/'+courseId+'/semester/'+s.id+'/attempt/'+latest.id+'\'">View Result</button>'+
+        '<button class="btn btn-gold btn-sm" onclick="location.hash=\'#/course/'+courseId+'/semester/'+s.id+'/quiz\'">Retake Assessment</button>';
+    }else{
+      assessActions = '<button class="btn btn-gold btn-sm" onclick="location.hash=\'#/course/'+courseId+'/semester/'+s.id+'/quiz\'">Take Assessment</button>';
+    }
+
     return '<div class="sem-card">'+
       '<div class="sem-head"><h3>'+esc(s.name)+'</h3><span class="pill">'+stats.pct+'% complete</span></div>'+
       '<div class="meter"><div class="meter-fill" style="width:'+stats.pct+'%"></div></div>'+
       '<div class="sem-assess-row"><span style="font-size:12.5px;color:var(--muted)">Assessment: pass mark '+s.pass_mark+'%, '+s.duration_mins+' min</span>'+
-      '<button class="btn btn-ghost btn-sm" disabled title="Coming soon">Take Assessment (coming soon)</button></div>'+
+      '<span class="sem-assess-actions">'+assessActions+'</span></div>'+
       modulesHtml+
     '</div>';
   }).join('');
@@ -370,4 +397,137 @@ async function renderLesson(view, courseId, lessonId){
   if(lesson.ltype==='worksheet'){
     bindWorksheetEvents(lesson, courseId, uid, existing);
   }
+}
+
+// ---------- assessment / quiz engine ----------
+// Scoring happens server-side (submit_quiz RPC), the browser never sees
+// correct_index until get_attempt_review decides it's safe to reveal.
+
+let QUIZ_STATE = null;
+
+function formatTime(totalSeconds){
+  const s = Math.max(0, totalSeconds);
+  const m = Math.floor(s/60);
+  const sec = s%60;
+  return (m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
+}
+
+async function renderQuiz(view, courseId, semesterId){
+  const uid = CTX.session.user.id;
+  const { data: semester, error: semErr } = await sb.from('semesters').select('id,name,pass_mark,duration_mins').eq('id', semesterId).single();
+  if(semErr || !semester) throw semErr || new Error('Semester not found');
+
+  const { data: existingAttempts } = await sb.from('assessment_attempts').select('passed').eq('semester_id', semesterId).eq('founder_id', uid);
+  if((existingAttempts||[]).some(a=>a.passed)){
+    view.innerHTML = '<div class="err">You have already passed this semester\'s assessment. Retakes are locked.</div>';
+    return;
+  }
+
+  const { data: questions, error: qErr } = await sb.rpc('get_quiz_questions', { p_semester_id: semesterId });
+  if(qErr) throw qErr;
+  if(!questions || !questions.length){
+    view.innerHTML = '<div class="err">No questions have been added for this assessment yet. Check back later.</div>';
+    return;
+  }
+
+  const sorted = questions.slice().sort((a,b)=>a.order_index-b.order_index);
+  QUIZ_STATE = { semesterId, courseId, questions: sorted, selections: {}, secondsLeft: semester.duration_mins*60, timer: null, submitting: false };
+
+  const qsHtml = sorted.map((q, idx)=>
+    '<div class="card" style="margin-bottom:14px"><div class="card-b">'+
+      '<div class="quiz-q-title">Q'+(idx+1)+'. '+esc(q.question)+' <span class="pill pill-muted">'+q.marks+' mark'+(q.marks===1?'':'s')+'</span></div>'+
+      (q.options||[]).map((opt, oi)=>
+        '<label class="quiz-option-row"><input type="radio" class="quiz-option" name="'+q.id+'" value="'+oi+'"> '+esc(opt)+'</label>'
+      ).join('')+
+    '</div></div>'
+  ).join('');
+
+  view.innerHTML = '<div class="crumb"><a onclick="location.hash=\'#/course/'+courseId+'\'">Back to Course</a> / '+esc(semester.name)+' Assessment</div>'+
+    '<div class="page-head-row"><div><h1>'+esc(semester.name)+' Assessment</h1>'+
+    '<p style="color:var(--muted);font-size:13.5px">Pass mark '+semester.pass_mark+'% &middot; '+sorted.length+' question'+(sorted.length===1?'':'s')+'</p></div>'+
+    '<div class="quiz-timer" id="quiz-timer">'+formatTime(QUIZ_STATE.secondsLeft)+'</div></div>'+
+    '<form id="quiz-form">'+qsHtml+
+      '<div class="wf-actions"><button type="submit" class="btn btn-gold" id="quiz-submit-btn">Submit Assessment</button></div>'+
+    '</form>';
+
+  document.getElementById('quiz-form').addEventListener('submit', (e)=>{ e.preventDefault(); finishQuiz(); });
+  document.querySelectorAll('.quiz-option').forEach(inp=>{
+    inp.addEventListener('change', (e)=>{ QUIZ_STATE.selections[e.target.name] = parseInt(e.target.value); });
+  });
+
+  QUIZ_STATE.timer = setInterval(()=>{
+    QUIZ_STATE.secondsLeft--;
+    const t = document.getElementById('quiz-timer');
+    if(t) t.textContent = formatTime(QUIZ_STATE.secondsLeft);
+    if(QUIZ_STATE.secondsLeft <= 0){
+      clearInterval(QUIZ_STATE.timer);
+      toast('Time is up. Submitting your answers.');
+      finishQuiz();
+    }
+  }, 1000);
+}
+
+async function finishQuiz(){
+  if(!QUIZ_STATE || QUIZ_STATE.submitting) return;
+  QUIZ_STATE.submitting = true;
+  if(QUIZ_STATE.timer) clearInterval(QUIZ_STATE.timer);
+  const btn = document.getElementById('quiz-submit-btn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Submitting...'; }
+
+  const answers = QUIZ_STATE.questions.map(q=>({
+    question_id: q.id,
+    selected_index: Object.prototype.hasOwnProperty.call(QUIZ_STATE.selections, q.id) ? QUIZ_STATE.selections[q.id] : null
+  }));
+
+  const { data: attempt, error } = await sb.rpc('submit_quiz', { p_semester_id: QUIZ_STATE.semesterId, p_answers: answers });
+  if(error){
+    toast('Could not submit: '+error.message, 'err');
+    QUIZ_STATE.submitting = false;
+    if(btn){ btn.disabled = false; btn.textContent = 'Submit Assessment'; }
+    return;
+  }
+  const courseId = QUIZ_STATE.courseId, semesterId = QUIZ_STATE.semesterId;
+  QUIZ_STATE = null;
+  location.hash = '#/course/'+courseId+'/semester/'+semesterId+'/attempt/'+attempt.id;
+}
+
+async function renderAttemptReview(view, courseId, semesterId, attemptId){
+  const { data: attempt, error: aErr } = await sb.from('assessment_attempts').select('*').eq('id', attemptId).single();
+  if(aErr || !attempt) throw aErr || new Error('Attempt not found');
+
+  const { data: rows, error: rErr } = await sb.rpc('get_attempt_review', { p_attempt_id: attemptId });
+  if(rErr) throw rErr;
+
+  const sorted = (rows||[]).slice().sort((a,b)=>a.order_index-b.order_index);
+  const revealed = sorted.some(q=>q.correct_index != null);
+
+  const qHtml = sorted.map((q, idx)=>{
+    const optHtml = (q.options||[]).map((opt, oi)=>{
+      let cls = '';
+      if(oi===q.selected_index) cls = q.is_correct ? 'quiz-opt-correct' : 'quiz-opt-wrong';
+      else if(revealed && oi===q.correct_index) cls = 'quiz-opt-correct';
+      let tag = '';
+      if(oi===q.selected_index) tag = ' (your answer)';
+      else if(revealed && oi===q.correct_index) tag = ' (correct answer)';
+      return '<div class="quiz-review-opt '+cls+'">'+esc(opt)+esc(tag)+'</div>';
+    }).join('');
+    const statusPill = q.selected_index==null
+      ? '<span class="pill pill-muted">Not answered</span>'
+      : (q.is_correct ? '<span class="pill pill-ok">Correct</span>' : '<span class="pill pill-warn">Incorrect</span>');
+    return '<div class="card" style="margin-bottom:12px"><div class="card-b">'+
+      '<div class="quiz-q-title">Q'+(idx+1)+'. '+esc(q.question)+' '+statusPill+'</div>'+
+      optHtml+
+    '</div></div>';
+  }).join('');
+
+  view.innerHTML = '<div class="crumb"><a onclick="location.hash=\'#/course/'+courseId+'\'">Back to Course</a> / Assessment Result</div>'+
+    '<div class="page-head"><h1>Assessment Result</h1></div>'+
+    '<div class="card" style="margin-bottom:20px"><div class="card-b">'+
+      '<p style="font-size:22px;font-weight:700;color:var(--navy)">'+Math.round(attempt.percentage)+'% '+
+        '<span class="pill '+(attempt.passed?'pill-ok':'pill-warn')+'" style="margin-left:8px">'+(attempt.passed?'Passed':'Failed')+'</span></p>'+
+      '<p style="font-size:13px;color:var(--muted);margin-top:6px">Score '+attempt.score+' / '+attempt.max_score+' &middot; Attempt #'+attempt.attempt_number+' &middot; submitted '+new Date(attempt.submitted_at).toLocaleString()+'</p>'+
+      (!attempt.passed ? '<p style="margin-top:12px"><button class="btn btn-gold btn-sm" onclick="location.hash=\'#/course/'+courseId+'/semester/'+semesterId+'/quiz\'">Retake Assessment</button></p>' : '')+
+      (!revealed ? '<p style="font-size:12px;color:var(--muted);margin-top:10px">Correct answers are shown once you pass this assessment.</p>' : '')+
+    '</div></div>'+
+    qHtml;
 }

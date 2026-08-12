@@ -161,7 +161,7 @@ async function renderCourseDesigner(view, courseId){
   if(error || !course) throw error || new Error('Course not found');
   const semesters = await fetchCourseTree(courseId);
 
-  CACHE = { course, semesters:{}, modules:{}, lessons:{} };
+  CACHE = { course, semesters:{}, modules:{}, lessons:{}, questions:{}, questionsById:{} };
   semesters.forEach(s=>{
     CACHE.semesters[s.id] = s;
     s.modules.forEach(m=>{
@@ -169,6 +169,15 @@ async function renderCourseDesigner(view, courseId){
       m.lessons.forEach(l=>{ CACHE.lessons[l.id] = l; });
     });
   });
+
+  const semesterIds = semesters.map(s=>s.id);
+  if(semesterIds.length){
+    const { data: questions } = await sb.from('assessment_questions').select('*').in('semester_id', semesterIds).order('order_index');
+    (questions||[]).forEach(q=>{
+      (CACHE.questions[q.semester_id] = CACHE.questions[q.semester_id] || []).push(q);
+      CACHE.questionsById[q.id] = q;
+    });
+  }
 
   const semHtml = semesters.map(s=> renderSemesterBlock(s)).join('');
 
@@ -191,7 +200,117 @@ function renderSemesterBlock(s){
     '<div class="tree-body">'+modulesHtml+
       '<button class="btn btn-ghost btn-sm" onclick="openCreateModuleModal(\''+s.id+'\')">+ Add Module</button>'+
     '</div>'+
+    renderQuestionsBlock(s)+
   '</div>';
+}
+
+function renderQuestionsBlock(s){
+  const qs = CACHE.questions[s.id] || [];
+  const rows = qs.map(q=> renderQuestionRow(q)).join('');
+  return '<div class="tree-sub">'+
+    '<div class="tree-head"><div><b>Assessment Questions</b><span class="tree-meta">'+qs.length+' question'+(qs.length===1?'':'s')+'</span></div></div>'+
+    '<div class="tree-body">'+rows+
+      '<button class="btn btn-ghost btn-sm" onclick="openCreateQuestionModal(\''+s.id+'\')">+ Add Question</button>'+
+    '</div>'+
+  '</div>';
+}
+
+function renderQuestionRow(q){
+  return '<div class="lesson-row" style="cursor:default">'+
+    '<span class="lesson-title">'+esc(q.question)+'</span>'+
+    '<span class="pill pill-muted">'+q.marks+' mark'+(q.marks===1?'':'s')+(q.negative_marks>0?', -'+q.negative_marks+' neg':'')+'</span>'+
+    '<span class="tree-actions"><button class="btn btn-ghost btn-sm" onclick="openEditQuestionModal(\''+q.id+'\')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteQuestion(\''+q.id+'\')">Delete</button></span>'+
+  '</div>';
+}
+
+// -- assessment question CRUD --
+
+let QUESTION_OPTIONS_STATE = [];
+let QUESTION_CORRECT_INDEX = 0;
+
+function openCreateQuestionModal(semesterId){
+  const count = (CACHE.questions[semesterId]||[]).length;
+  openQuestionModal(null, semesterId, count);
+}
+function openEditQuestionModal(id){
+  const q = CACHE.questionsById[id];
+  openQuestionModal(q, q.semester_id, q.order_index);
+}
+
+function openQuestionModal(question, semesterId, orderIndex){
+  const isEdit = !!question;
+  QUESTION_OPTIONS_STATE = question ? question.options.slice() : ['', '', '', ''];
+  QUESTION_CORRECT_INDEX = question ? question.correct_index : 0;
+
+  openModal(
+    '<h3>'+(isEdit?'Edit':'Add')+' Question</h3>'+
+    '<form id="q-form">'+
+      '<div class="field"><label>Question</label><textarea id="qf-question" rows="2" required>'+esc(question?question.question:'')+'</textarea></div>'+
+      '<div class="field"><label>Options (select the correct one)</label><div id="q-options"></div>'+
+        '<button type="button" class="btn btn-ghost btn-sm" onclick="addQuestionOption()">+ Add Option</button></div>'+
+      '<div class="field row2">'+
+        '<div><label>Marks (correct)</label><input id="qf-marks" type="number" min="0" step="0.5" value="'+(question?question.marks:1)+'"></div>'+
+        '<div><label>Negative marks (wrong)</label><input id="qf-neg" type="number" min="0" step="0.5" value="'+(question?question.negative_marks:0)+'"></div>'+
+      '</div>'+
+      '<div class="modal-actions"><button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button><button type="submit" class="btn btn-gold">'+(isEdit?'Save':'Add')+'</button></div>'+
+    '</form>',
+    { wide:true }
+  );
+  renderQuestionOptions();
+
+  document.getElementById('q-form').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const questionText = document.getElementById('qf-question').value.trim();
+    const marks = parseFloat(document.getElementById('qf-marks').value)||0;
+    const negative_marks = parseFloat(document.getElementById('qf-neg').value)||0;
+    const options = QUESTION_OPTIONS_STATE.map(o=>o.trim());
+    if(!questionText || options.length<2 || options.some(o=>!o)){
+      toast('Add a question and at least 2 non-empty options.', 'err');
+      return;
+    }
+    const payload = { question: questionText, options, correct_index: QUESTION_CORRECT_INDEX, marks, negative_marks };
+    let error;
+    if(isEdit){
+      ({ error } = await sb.from('assessment_questions').update(payload).eq('id', question.id));
+    }else{
+      ({ error } = await sb.from('assessment_questions').insert(Object.assign({ semester_id: semesterId, order_index: orderIndex }, payload)));
+    }
+    if(error){ toast('Could not save question: '+error.message, 'err'); return; }
+    closeModal(); toast('Question saved.'); route();
+  });
+}
+
+function renderQuestionOptions(){
+  const box = document.getElementById('q-options');
+  if(!box) return;
+  box.innerHTML = QUESTION_OPTIONS_STATE.map((opt, idx)=>
+    '<div class="q-option-row">'+
+      '<input type="radio" name="q-correct" '+(QUESTION_CORRECT_INDEX===idx?'checked':'')+' onclick="QUESTION_CORRECT_INDEX='+idx+'">'+
+      '<input type="text" class="q-opt-input" data-idx="'+idx+'" value="'+esc(opt)+'" placeholder="Option '+(idx+1)+'">'+
+      (QUESTION_OPTIONS_STATE.length>2 ? '<button type="button" class="btn btn-danger btn-sm" onclick="removeQuestionOption('+idx+')">Remove</button>' : '')+
+    '</div>'
+  ).join('');
+  box.querySelectorAll('.q-opt-input').forEach(inp=>{
+    inp.addEventListener('input', (e)=>{ QUESTION_OPTIONS_STATE[+e.target.dataset.idx] = e.target.value; });
+  });
+}
+function addQuestionOption(){
+  QUESTION_OPTIONS_STATE.push('');
+  renderQuestionOptions();
+}
+function removeQuestionOption(idx){
+  QUESTION_OPTIONS_STATE.splice(idx,1);
+  if(QUESTION_CORRECT_INDEX>=QUESTION_OPTIONS_STATE.length) QUESTION_CORRECT_INDEX = 0;
+  else if(QUESTION_CORRECT_INDEX>idx) QUESTION_CORRECT_INDEX--;
+  renderQuestionOptions();
+}
+
+async function deleteQuestion(id){
+  const q = CACHE.questionsById[id];
+  if(!confirm('Delete this question? This cannot be undone.\n\n"'+q.question+'"')) return;
+  const { error } = await sb.from('assessment_questions').delete().eq('id', id);
+  if(error){ toast('Could not delete: '+error.message, 'err'); return; }
+  toast('Question deleted.'); route();
 }
 
 function renderModuleBlock(m){
